@@ -1,0 +1,19 @@
+@model List<string>
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@for (int i = 0; i < Model.Count; i++)
+{
+    <div class="form-group">
+        <label class="col-md-2 control-label">UserClaimType</label>
+        <div class="col-md-4">
+            <input name="PlanAddUserClaimDict[@i].Key" value="@Model[i]" class="form-control" readonly>
+
+        </div>
+        <label class="col-md-2 control-label">UserClaimValue</label>
+        <div class="col-md-4">
+            <input name="PlanAddUserClaimDict[@i].Value" class="form-control">
+        </div>
+    </div>
+
+}

@@ -1,0 +1,36 @@
+﻿@model IdentityServer4.EntityFramework.Entities.IdentityResource
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <h4>删除IdentityServer</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DisplayName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DisplayName)
+        </dd>
+
+    </dl>
+
+    <form asp-action="Delete">
+        <div class="col-md-offset-3">
+            <input asp-for="Id" hidden="hidden" />
+            <button type="submit" class="btn btn-danger">删除</button>
+            <a asp-action="Index">返回列表</a>
+        </div>
+    </form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

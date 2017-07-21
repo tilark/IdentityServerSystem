@@ -1,0 +1,103 @@
+﻿@model IdentityServerSystem.Models.ManageClientViewModels.CreateClientViewModel
+@using IdentityServerSystem.Models.ManageClientViewModels
+@inject IdentityServerSystem.Services.ConfigDbContextDropDownListService configContextDropDownList
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend>创建Client</legend>
+    <form asp-action="Create" asp-controller="ManageClients">
+        <div class="form-horizontal">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ClientId" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="ClientId" class="form-control" />
+                    <span asp-validation-for="ClientId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientName" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="ClientName" class="form-control" />
+                    <span asp-validation-for="ClientName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="GrantTypesEnum" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <select asp-for="GrantTypesEnum" asp-items="Html.GetEnumSelectList<GrantTypesEnum>()" class="form-control"></select>
+                    <span asp-validation-for="GrantTypesEnum" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group clientRedirectUris">
+                <label asp-for="RedirectUris" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <input name="RedirectUris" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button" onclick='deleteTargetElement($(this), ".clientRedirectUris")'><span class="glyphicon glyphicon-trash"></span></button>
+                        </span>
+                    </div><!-- /input-group -->
+                </div>
+
+            </div>
+            <div class="form-group" id="add-redirect-uri">
+                <div class="col-md-offset-4">
+                    <button class="btn btn-default" type="button" onclick='addCloneElementToTargetElementID($(this), ".clientRedirectUris", "#add-redirect-uri")'><span class="glyphicon glyphicon-plus"></span>添加RedirectUri</button>
+                </div>
+            </div>
+
+            <div class="form-group clientPostLogoutRedirectUris">
+                <label asp-for="PostLogoutRedirectUris" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <input name="PostLogoutRedirectUris" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button" onclick='deleteTargetElement($(this), ".clientPostLogoutRedirectUris")'><span class="glyphicon glyphicon-trash"></span></button>
+                        </span>
+                    </div><!-- /input-group -->
+                </div>
+
+            </div>
+            <div class="form-group" id="add-post-logout-redirect-uri">
+                <div class="col-md-offset-4">
+                    <button class="btn btn-default" type="button" onclick='addCloneElementToTargetElementID($(this), ".clientPostLogoutRedirectUris", "#add-post-logout-redirect-uri")'><span class="glyphicon glyphicon-plus"></span>添加PostLogoutRedirectUris</button>
+                </div>
+            </div>
+
+            <div class="form-group clientAllowedScopes">
+                <label asp-for="AllowedScopes" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+
+                    @*<input name="AllowedScopes" class="form-control" />*@
+                    <select asp-for="AllowedScopes" asp-items="@configContextDropDownList.GetIdentityResourceDisplayNameDropDownList()" class="form-control multiple-bind-select2" multiple></select>
+
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-5">
+                    <input type="submit" value="创建" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </form>
+    <div>
+        <a asp-action="Index">返回列表</a>
+    </div>
+</fieldset>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        $(function () {
+            bindSimpleSelect2();
+
+        })
+    </script>
+}

@@ -1,0 +1,64 @@
+﻿@model IdentityServerSystem.Models.ManageIdentityResourceViewModel.IdentityResourcesCreateViewModel
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend>创建IdentityResource</legend>
+    <form asp-action="Create" asp-controller="ManageIdentityResources">
+        <div class="form-horizontal">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="DisplayName" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="DisplayName" class="form-control" />
+                    <span asp-validation-for="DisplayName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Emphasize" class="col-md-2 control-label"></label>
+                <div class="col-md-2">
+                    <input asp-for="Emphasize" type="checkbox" class="form-control" />
+                    <span asp-validation-for="Emphasize" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group identityResourceClaimType">
+                <label asp-for="ClaimTypes" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <input name="ClaimTypes" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-danger" type="button" onclick='deleteTargetElement($(this), ".identityResourceClaimType")'><span class="glyphicon glyphicon-trash"></span></button>
+                        </span>
+                    </div><!-- /input-group -->
+                   
+                </div>
+            </div>
+            <div class="form-group" id="add-claim-type">
+                <div class="col-md-offset-3">
+                    <button class="btn btn-default" type="button" onclick='addCloneElementToTargetElementID($(this), ".identityResourceClaimType", "#add-claim-type")'><span class="glyphicon glyphicon-edit"></span>添加ClaimType</button>
+                </div>
+               
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-5">
+                    <input type="submit" value="创建" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </form>
+    <div>
+        <a asp-action="Index">返回列表</a>
+    </div>
+</fieldset>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

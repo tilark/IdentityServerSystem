@@ -1,0 +1,76 @@
+﻿@model IdentityServerSystem.Models.ManageUserClaimViewModels.AddUserClaimViewModel
+@inject IdentityServerSystem.Services.ConfigDbContextDropDownListService configContextDropDownListService
+@{
+    ViewData["Title"] = "添加用户UserClaim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">添加用户UserClaim</legend>
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <!--显示User与UserClaim历史消息-->
+    <div class="form-horizontal">       
+        <div class="form-group">
+            <label asp-for="UserName" class="col-md-2 control-label"></label>
+            <div class="col-md-4">
+                <input asp-for="UserName" class="form-control" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="FullName" class="col-md-2 control-label"></label>
+            <div class="col-md-4">
+                <input asp-for="FullName" class="form-control" readonly>
+            </div>
+
+        </div>
+        @if (Model.HasExsistUserClaims != null && Model.HasExsistUserClaims.Count > 0)
+        {
+            foreach (var userClaim in Model.HasExsistUserClaims)
+            {
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> UserClaimType</label>
+                    <div class="col-md-4">
+                        <input asp-for="@userClaim.Key" class="form-control" readonly>
+                        @*<select asp-for="@userClaim.Key" asp-items="@configContextDropDownListService.GetIdentityResourceClaimTypeDropDownList()"></select>*@
+                    </div>
+                    <label class="col-md-2 control-label">UserClaimValue</label>
+                    <div class="col-md-4">
+                        <input asp-for="@userClaim.Value" class="form-control" readonly>
+                    </div>
+                </div>
+            }
+        }     
+        <div class="form-group">
+            <label class="col-md-2">选择IdentityResource</label>
+            <div class="col-md-10">
+                <select asp-items="@configContextDropDownListService.GetIdentityResourceIDDropDownList()" class="form-control" id="get-identity-resource-select" onchange="getIdentityResourceSelect(this.value)"></select>
+            </div>
+        </div>
+    </div>
+    <!--筛选出IdentityResource，并能够自动显示出属于该IdentityResource的Claims-->
+    
+    
+
+    <!--Form中只要保留User Id及IdentityResource的Claims的输入框，再提交添加-->
+    <form asp-action="AddUserClaim" asp-controller="ManageUserClaims">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-horizontal" >
+            
+
+            <div id="target-identity-resource-claims">
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-primary">添加</button>
+                    <a asp-action="Index" asp-route-id="@Model.Id" class="btn btn-warning">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</fieldset>
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

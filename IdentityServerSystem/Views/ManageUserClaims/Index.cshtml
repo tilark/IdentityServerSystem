@@ -1,0 +1,54 @@
+﻿@model IdentityServerSystem.Models.ApplicationUser
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">Clients</legend>
+    <table class="table table-bordered" id="table_id">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.UserName)</th>
+
+                <th>@Html.DisplayNameFor(model => model.FullName)</th>
+                <th>@Html.DisplayNameFor(model => model.Email)</th>
+                <th>@Html.DisplayNameFor(model => model.Telephone)</th>
+                <th>@Html.DisplayNameFor(model => model.Claims)</th>             
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => Model.UserName)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.FullName)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.Email)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.Telephone)</td>
+
+                    <td>
+                        @foreach (var claim in Model.Claims)
+                        {
+                            @(claim.ClaimType + "-" + @claim.ClaimValue) <br />
+
+                        }
+                    </td>
+                  
+                    <td>
+                        <a asp-action="AddUserClaim" asp-route-id="@Model.Id" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span>&nbsp;添加</a>
+                        <a asp-action="EditUserClaim" asp-route-id="@Model.Id" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-edit"></span>&nbsp;修改</a>
+                        <a asp-action="DeleteUserClaim" asp-route-id="@Model.Id" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</a>
+                    </td>
+
+                </tr>          
+        </tbody>
+    </table>
+    <a asp-action="ListUsers" asp-controller="ManageUsers">返回用户列表</a>
+</fieldset>
+
+@section scripts{
+    @Html.Partial("_TableUseDataTable")
+
+}

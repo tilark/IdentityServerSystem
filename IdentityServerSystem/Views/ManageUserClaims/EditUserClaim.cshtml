@@ -1,0 +1,55 @@
+﻿@model IdentityServerSystem.Models.ManageUserClaimViewModels.EditUserClaimViewModel
+@inject IdentityServerSystem.Services.ConfigDbContextDropDownListService configContextDropDownListService
+@{
+    ViewData["Title"] = "更新用户UserClaim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">更新用户UserClaim</legend>
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <form asp-action="EditUserClaim" asp-controller="ManageUserClaims">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label asp-for="UserName" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="UserName" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="FullName" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="FullName" class="form-control" readonly>
+                </div>
+
+            </div>
+
+            @for (int i = 0; i < Model.UserClaims.Count; i++)
+            {
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> UserClaimType</label>
+                    <div class="col-md-4">
+                        <input name="UserClaims[@i].Key" value="@Model.UserClaims.ElementAt(i).Key" class="form-control">
+                    </div>
+                    <label class="col-md-2 control-label">UserClaimValue</label>
+                    <div class="col-md-4">
+                        <input name="UserClaims[@i].Value" value="@Model.UserClaims.ElementAt(i).Value" class="form-control">
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-primary">更新</button>
+                    <a asp-action="Index" asp-route-id="@Model.Id" class="btn btn-warning">取消</a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</fieldset>
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

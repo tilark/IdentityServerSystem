@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">
+        用户管理界面
+    </legend>
+    <div class="panel">
+        <a asp-action="ListUsers" asp-controller="ManageUsers" class="btn btn-primary">用户列表</a>
+        <a asp-action="AddUser" asp-controller="ManageUsers" class="btn btn-primary">新增用户</a>
+       
+
+    </div>
+</fieldset>
+

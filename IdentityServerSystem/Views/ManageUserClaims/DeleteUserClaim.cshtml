@@ -1,0 +1,51 @@
+﻿@model IdentityServerSystem.Models.ManageUserClaimViewModels.DeleteUserClaimViewModel
+@{
+    ViewData["Title"] = "删除用户UserClaim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<fieldset class="col-md-12 panel panel-default">
+    <legend>删除用户UserClaim</legend>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label asp-for="UserName" class="col-md-2 control-label"></label>
+            <div class="col-md-4">
+                <input asp-for="UserName" class="form-control" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="FullName" class="col-md-2 control-label"></label>
+            <div class="col-md-4">
+                <input asp-for="FullName" class="form-control" readonly>
+            </div>
+
+        </div>
+
+        @for (int i = 0; i < Model.UserClaims.Count; i++)
+            {
+            <form asp-action="DeleteUserClaimFromUser" asp-controller="ManageUserClaims" data-ajax="true" data-ajax-mode="before"  data-ajax-update="#delete-user-claim-log" data-ajax-success="deleteUserClaimSuccess"  data-ajax-method="post">
+                <div class="form-group">
+
+                    <input asp-for="Id" hidden="hidden" />
+                    <label class="col-md-2 control-label"> UserClaimType</label>
+                    <div class="col-md-3">
+                        <input name="userClaimType" value="@Model.UserClaims.ElementAt(i).Key" class="form-control" readonly>
+                    </div>
+                    <label class="col-md-2 control-label">UserClaimValue</label>
+                    <div class="col-md-3">
+                        <input value="@Model.UserClaims.ElementAt(i).Value" class="form-control" disabled>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
+                    </div>
+                </div>
+            </form>
+        }
+        <div class="form-group">
+            <h4 id="delete-user-claim-log"></h4>
+        </div> 
+        <a asp-action="Index" asp-route-id="@Model.Id">返回列表</a>
+    </div>
+</fieldset>
+@section Scripts {
+    <script src="~/lib/jquery.unobtrusive-ajax/jquery.unobtrusive-ajax.min.js"></script>
+}

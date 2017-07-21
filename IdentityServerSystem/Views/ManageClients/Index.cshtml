@@ -1,0 +1,77 @@
+﻿@model IEnumerable<IdentityServer4.EntityFramework.Entities.Client>
+@{
+}
+<p>
+    <a asp-action="Create">Create New Client</a>
+</p>
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">Clients</legend>
+    <table class="table table-bordered" id="table_id">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.ClientId)</th>
+
+                <th>@Html.DisplayNameFor(model => model.ClientName)</th>
+                <th>@Html.DisplayNameFor(model => model.AllowedGrantTypes)</th>
+                <th>@Html.DisplayNameFor(model => model.RequireConsent)</th>
+                <th>@Html.DisplayNameFor(model => model.RedirectUris)</th>
+                <th>@Html.DisplayNameFor(model => model.PostLogoutRedirectUris)</th>
+                <th>@Html.DisplayNameFor(model => model.AllowedScopes)</th>
+                <th>@Html.DisplayNameFor(model => model.AllowOfflineAccess)</th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.ClientId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ClientName)</td>
+
+                    <td>
+                    @foreach(var grantType in item.AllowedGrantTypes)
+                    {
+                        @grantType.GrantType <br />
+
+                    }
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.RequireConsent)</td>
+                    <td>
+                        @foreach (var redirectUrl in item.RedirectUris)
+                        {
+                            @redirectUrl.RedirectUri; <br />
+                        }
+                    </td>
+                    <td>
+                        @foreach(var postLogoutRedirectUri in item.PostLogoutRedirectUris)
+                        {
+                        @postLogoutRedirectUri.PostLogoutRedirectUri <br />
+                        }
+                    </td>
+                    <td>
+                        @foreach (var scope in item.AllowedScopes)
+                        {
+                            
+                            @scope.Scope; <br />
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.AllowOfflineAccess)</td>
+                    
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-edit"></span>&nbsp;编辑</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</a>
+                    </td>
+
+                </tr>
+
+            }
+
+        </tbody>
+    </table>
+</fieldset>
+
+@section scripts{
+    @Html.Partial("_TableUseDataTable")
+
+}

@@ -1,0 +1,34 @@
+﻿@model IdentityServer4.EntityFramework.Entities.Client
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <h4>删除Client</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ClientId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClientId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ClientName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClientName)
+        </dd>
+        
+    </dl>
+
+    <form asp-action="Delete">
+        <div class="col-md-offset-3">
+            <input asp-for="Id" hidden="hidden"/>
+            <button type="submit" class="btn btn-danger">删除</button>
+            <a asp-action="Index">返回列表</a>
+        </div>
+    </form>
+</div>
+

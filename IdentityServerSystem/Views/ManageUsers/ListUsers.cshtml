@@ -1,0 +1,68 @@
+﻿@model IEnumerable<IdentityServerSystem.Models.ApplicationUser>
+
+    @{
+        ViewData["Title"] = "ListUsers";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <h2>用户列表</h2>
+
+    <p>
+        <a asp-action="AddUser">创建新用户</a>
+    </p>
+    <table class="table" id="table_id">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FullName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Telephone)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ApplicationDepartment)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Telephone)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ApplicationDepartment.DepartmentName)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">编辑</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">详情</a> |
+                        <a asp-action="Index" asp-controller="ManageUserClaims" asp-route-id="@item.Id" class="btn btn-primary">管理UserClaims</a>
+                        <a asp-action="ChangeUserPassword" asp-route-id="@item.Id" class="btn btn-danger">更改密码</a> |
+                        <a asp-action="ResetUserPassword" asp-route-id="@item.Id" class="btn btn-danger">重置密码</a> |
+                        <a asp-action="DeleteUser" asp-route-id="@item.Id" class="btn btn-danger">删除</a> 
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+@section scripts{
+    @Html.Partial("_TableUseDataTable")
+
+}

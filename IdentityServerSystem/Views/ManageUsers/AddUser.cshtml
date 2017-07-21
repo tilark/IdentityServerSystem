@@ -1,0 +1,79 @@
+﻿@model IdentityServerSystem.Models.ManageUserViewModels.CreateUserViewModel
+@inject IdentityServerSystem.Services.DropDownListService dropDownListService
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">创建新用户</legend>
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <form asp-action="AddUser" asp-controller="ManageUsers">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label asp-for="UserName" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="UserName" class="form-control">
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="col-md-2 control-label text-danger"></label>
+                <div class="col-md-4">
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="col-md-2 control-label text-danger"></label>
+                <div class="col-md-4">
+                    <input asp-for="ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="FamilyName" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="FamilyName" class="form-control">
+                    <span asp-validation-for="FamilyName" class="text-danger"></span>
+
+                </div>
+                <label asp-for="FirstName" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="FirstName" class="form-control">
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Telephone" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="Telephone" class="form-control">
+                    <span asp-validation-for="Telephone" class="text-danger"></span>
+
+                </div>
+                <label asp-for="DepartmentID" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <select asp-for="DepartmentID" asp-items="@dropDownListService.GetDepartmentDropDownList()" class="form-control"></select>
+                    <span asp-validation-for="DepartmentID" class="text-danger"></span>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-primary">创建</button>
+                    <a asp-action="ListUsers" class="btn btn-warning">取消</a>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+</fieldset>
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

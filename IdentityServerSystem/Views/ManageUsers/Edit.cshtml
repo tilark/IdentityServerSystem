@@ -1,0 +1,54 @@
+﻿@model IdentityServerSystem.Models.ManageUserViewModels.EditUserViewModel
+@inject IdentityServerSystem.Services.DropDownListService dropDownListService
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">编辑用户信息</legend>
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <form asp-action="Edit" asp-controller="ManageUsers">
+        <div class="form-horizontal">
+            <input  type="hidden" asp-for="id"/>
+            <div class="form-group">
+                <label asp-for="UserName" class="col-md-2 control-label"></label>
+                <div class="col-md-4 text-left">
+                    <input asp-for="UserName" class="control-label" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="FamilyName" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="FamilyName" class="form-control">
+                </div>
+                <label asp-for="FirstName" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="FirstName" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Telephone" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="Telephone" class="form-control">
+                </div>
+                <label asp-for="DepartmentID" class="col-md-2 control-label"></label>
+                <div class="col-md-4">
+                    <select asp-for="DepartmentID" asp-items="@dropDownListService.GetDepartmentDropDownList()" class="form-control"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-primary">更新</button>
+                    <a asp-action="ListUsers" class="btn btn-warning">取消</a>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</fieldset>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
