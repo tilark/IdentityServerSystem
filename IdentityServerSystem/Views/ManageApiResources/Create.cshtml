@@ -1,0 +1,43 @@
+﻿@model IdentityServerSystem.Models.ManageApiResourceViewModels.ApiResourceCreateViewModel
+@inject IdentityServerSystem.Services.ConfigDbContextDropDownListService configContextList
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend>创建ApiResource</legend>
+    <form asp-action="Create" asp-controller="ManageApiResources">
+        <div class="form-horizontal">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    @*<input asp-for="Name" class="form-control" />*@
+                    <select asp-for="Name" asp-items="configContextList.GetIdentityResourceClaimTypeDropDownList()" class="form-control multiple-bind-select2"></select>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="DisplayName" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="DisplayName" class="form-control" />
+                    <span asp-validation-for="DisplayName" class="text-danger"></span>
+                </div>
+            </div>           
+          
+            <div class="form-group">
+                <div class="col-md-offset-5">
+                    <input type="submit" value="创建" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </form>
+    <div>
+        <a asp-action="Index">返回列表</a>
+    </div>
+</fieldset>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @Html.Partial("_Select2Partial")
+}

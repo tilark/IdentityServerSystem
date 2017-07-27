@@ -33,6 +33,11 @@
                     </div>
                 }
             </div>
+            <div class="form-group">
+                <label asp-for="AllowOfflineAccess" class="col-md-2 control-label" data-toggle="tooltip" data-placement="top" title="选中Hybrid模式需设为True"></label>
+                <input asp-for="AllowOfflineAccess" type="checkbox" />
+            </div>
+          
             @foreach (var redirectUri in Model.RedirectUris)
             {
                 <div class="form-group clientRedirectUris">
@@ -98,10 +103,5 @@
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-    <script>
-        $(function () {
-            bindSimpleSelect2();
-
-        })
-    </script>
+@Html.Partial("_Select2Partial")
 }

@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Authentication
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<form asp-action="GetDepartmentMessageFromHumanResourceSystem" method="get">
+    <button class="btn btn-primary" type="submit">从HumanResourceSystem获取科室信息</button>
+</form>
+
+<table>
+    <tr>
+        <td>Type</td>
+        <td>Value</td>
+    </tr>
+    @foreach (var claim in User.Claims)
+    {
+        <tr>
+            <td>@claim.Type</td>
+            <td>@claim.Value</td>
+        </tr>
+
+    }
+
+    <tr>
+        <td>access token</td>
+        <td>@await ViewContext.HttpContext.Authentication.GetTokenAsync("access_token")</td>
+
+    </tr>
+    <tr>
+        <td>refresh token</td>
+        <td>@await ViewContext.HttpContext.Authentication.GetTokenAsync("refresh_token")</td>
+    </tr>
+</table>
+
+

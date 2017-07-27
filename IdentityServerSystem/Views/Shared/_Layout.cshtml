@@ -18,8 +18,9 @@
     <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/select2/dist/css/select2.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/lib/datatable/media/css/dataTables.bootstrap.min.css" />
+
+    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -56,6 +57,9 @@
                     <li><a asp-area="" asp-controller="ManageUsers" asp-action="ListUsers">人员管理</a></li>
                     <li><a asp-area="" asp-controller="ManageIdentityResources" asp-action="Index">IdentityResources</a></li>
                     <li><a asp-area="" asp-controller="ManageClients" asp-action="Index">Clients</a></li>
+                    <li><a asp-area="" asp-controller="ManageApiResources" asp-action="Index">ApiResources</a></li>
+                    <li><a asp-area="" asp-controller="GetDepartmentFromWebApi" asp-action="Index">从WebApi获取资源</a></li>
+
 
                     
                 </ul>

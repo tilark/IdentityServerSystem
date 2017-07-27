@@ -68,6 +68,12 @@ namespace IdentityServerSystem.Services
             }
             return identityResourceSelect;
         }
+
+        /// <summary>
+        /// IdentityResource的细则
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public List<SelectListItem> GetIdentityResourceClaimTypeDropDownList(string key = null)
         {
             var identityResourceSelect = new List<SelectListItem>();

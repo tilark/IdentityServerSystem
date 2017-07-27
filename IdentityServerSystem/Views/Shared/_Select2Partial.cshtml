@@ -1,0 +1,17 @@
+<environment names="Development">
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
+    <script src="~/lib/select2/dist/js/i18n/zh-CN.js"></script>
+
+</environment>
+<environment names="Staging,Production">
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
+    <script src="~/lib/select2/dist/js/i18n/zh-CN.js"></script>
+</environment>
+
+<script>
+    $(document).ready(function () {
+        $(".multiple-bind-select2").select2({
+            language: 'zh-CN'
+        });
+    })
+</script>

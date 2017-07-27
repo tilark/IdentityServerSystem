@@ -147,7 +147,7 @@ namespace IdentityServerSystem.Controllers
         private async Task<ApplicationUser> CreateNewUser(string userName, string password, Guid? departmentID, string familyName, string firstName, string telephone)
         {
             //先创建一个新的ApplicationUser，看是否成功，成功返回该用户信息
-            var user = new ApplicationUser { UserName = userName, DepartmentID = departmentID, FamilyName = familyName, FirstName = firstName, Telephone = telephone };
+            var user = new ApplicationUser { Id=Guid.NewGuid(), UserName = userName, DepartmentID = departmentID, FamilyName = familyName, FirstName = firstName, Telephone = telephone };
             var result = await _userManager.CreateAsync(user, password);
            
             if (result.Succeeded)

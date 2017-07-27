@@ -21,9 +21,7 @@ namespace IdentityServerSystem
         {
             return new List<ApiResource>
             {
-                new ApiResource("scope.readaccess", "Example API"),
-                new ApiResource("scope.fullaccess", "Example API"),
-                new ApiResource("scope.editownered", "Edit You Owned")
+                new ApiResource("scope.readaccess", "Example API")                
             };
 
         }
@@ -36,8 +34,7 @@ namespace IdentityServerSystem
                 new IdentityResources.Profile(),
                 new IdentityResources.Email(),
                 new IdentityResources.Address(),
-                new IdentityResources.Phone(),
-                new IdentityResource("customResource","CustmeResource" ,new []{"CustomClaimType1", "CustomClaimType2"})
+                new IdentityResources.Phone()               
             };
         }
 
@@ -77,55 +74,13 @@ namespace IdentityServerSystem
                     PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
                    AllowedScopes = new List<string>
                     {
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        "customResource",
+                        IdentityServerConstants.StandardScopes.OpenId,                        
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Email,
                         IdentityServerConstants.StandardScopes.Address,
                         IdentityServerConstants.StandardScopes.Phone
                     }
-                },
-                new Client
-                {
-                    ClientId = "ClientIDReadAndEdit",
-                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                    ClientSecrets =
-                    {
-                        new Secret("secretUserPassword".Sha256())
-                    },
-                    AllowedScopes = { "scope.readaccess" , "scope.editownered" }
-                },
-                new Client
-                {
-                    ClientId = "ClientIdThatCanOnlyRead",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-
-                    ClientSecrets =
-                    {
-                        new Secret("secret1".Sha256())
-                    },
-                    AllowedScopes = {"scope.readaccess"}
-                },
-                new Client
-                {
-                    ClientId = "ClientIdWithFullAccess",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    ClientSecrets =
-                    {
-                        new Secret("secret2".Sha256())
-                    },
-                    AllowedScopes = {"scope.fullaccess"}
-                },
-                new Client
-                {
-                    ClientId = "ClientIDWithEditOwned",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    ClientSecrets =
-                    {
-                        new Secret("secret3".Sha256())
-                    },
-                    AllowedScopes = { "scope.editownered" }
-                }
+                }               
             };
         }
 

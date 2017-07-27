@@ -24,7 +24,7 @@ namespace IdentityServerSystem.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var viewModel = await _configurationContext.Clients.Include(a => a.AllowedScopes).Include(a => a.RedirectUris).Include(a => a.PostLogoutRedirectUris).Include(a => a.AllowedGrantTypes).ToListAsync();
+            var viewModel = await _configurationContext.Clients.AsNoTracking().Include(a => a.AllowedScopes).Include(a => a.RedirectUris).Include(a => a.PostLogoutRedirectUris).Include(a => a.AllowedGrantTypes).Include(a => a.ClientSecrets).ToListAsync();
             return View(viewModel);
         }
 
@@ -44,7 +44,7 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var newClient = await CreateNewClient(createClientViewModel.ClientId, createClientViewModel.ClientName, createClientViewModel.GrantTypesEnum, createClientViewModel.RedirectUris, createClientViewModel.PostLogoutRedirectUris, createClientViewModel.AllowedScopes);
+                var newClient = await CreateNewClient(createClientViewModel.ClientId, createClientViewModel.ClientName, createClientViewModel.GrantTypesEnum, createClientViewModel.RedirectUris, createClientViewModel.PostLogoutRedirectUris, createClientViewModel.AllowedScopes, createClientViewModel.ClientSecrets, createClientViewModel.AllowOfflineAccess);
                 if (newClient != null)
                 {
                     return RedirectToAction(nameof(Index));
@@ -57,16 +57,18 @@ namespace IdentityServerSystem.Controllers
             return View(createClientViewModel);
         }
 
-        private async Task<Client> CreateNewClient(string clientId, string clientName, GrantTypesEnum grantTypesEnum, List<string> redirectUris, List<string> postLogoutRedirectUris, List<string> allowedScopes)
+        private async Task<Client> CreateNewClient(string clientId, string clientName, GrantTypesEnum grantTypesEnum, List<string> redirectUris, List<string> postLogoutRedirectUris, List<string> allowedScopes, List<string> clientSecrets, bool allowOfflineAccess)
         {
             var newClient = new Client
             {
                 ClientId = clientId,
                 ClientName = clientName,
+                ClientSecrets = GetClientSecrets(clientSecrets),
                 AllowedGrantTypes = GetGrantType(grantTypesEnum),
                 RedirectUris = redirectUris,
                 PostLogoutRedirectUris = postLogoutRedirectUris,
-                AllowedScopes = allowedScopes
+                AllowedScopes = allowedScopes,
+                AllowOfflineAccess = allowOfflineAccess
             };
             _configurationContext.Clients.Add(newClient.ToEntity());
             try
@@ -79,6 +81,17 @@ namespace IdentityServerSystem.Controllers
 
                 return null;
             }
+        }
+
+        private ICollection<Secret> GetClientSecrets(List<string> clientSecrets)
+        {
+            var result = new List<Secret>();
+            foreach(var clientSecret in clientSecrets)
+            {
+                var secret = new Secret(clientSecret.Sha256());
+                result.Add(secret);
+            }
+            return result;
         }
 
         private IEnumerable<string> GetGrantType(GrantTypesEnum grantTypesEnum)
@@ -126,7 +139,8 @@ namespace IdentityServerSystem.Controllers
                     AllowedGrantTypes = client.AllowedGrantTypes.Select(a => a.GrantType).ToList(),
                     AllowedScopes = client.AllowedScopes.Select(a => a.Scope).ToList(),
                     RedirectUris = client.RedirectUris.Select(a => a.RedirectUri).ToList(),
-                    PostLogoutRedirectUris = client.PostLogoutRedirectUris.Select(a => a.PostLogoutRedirectUri).ToList()
+                    PostLogoutRedirectUris = client.PostLogoutRedirectUris.Select(a => a.PostLogoutRedirectUri).ToList(),
+                    AllowOfflineAccess = client.AllowOfflineAccess
                 };
                 return View(viewModel);
             }
@@ -136,6 +150,7 @@ namespace IdentityServerSystem.Controllers
 
             }
         }
+
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
@@ -233,6 +248,86 @@ namespace IdentityServerSystem.Controllers
             return RedirectToAction("Index");
         }
 
+        #endregion
+
+        #region 重置ClientSecrets
+        public async Task<IActionResult> ResetClientSecret(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var client = await _configurationContext.Clients.Where(a => a.Id == id).FirstOrDefaultAsync();
+            if (client != null)
+            {
+                var viewModel = new ResetClientSecretViewModel
+                {
+                    ClientId = client.ClientId,
+                    id = client.Id,
+                    ClientName = client.ClientName,
+                };
+                return View(viewModel);
+            }
+            else
+            {
+                return BadRequest();
+
+            }
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> ResetClientSecret(ResetClientSecretViewModel resetClientSecretSViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var updateClient = await HandleResetClientSecret(resetClientSecretSViewModel.id, resetClientSecretSViewModel.ClientSecrets);
+                if (updateClient != null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError(String.Empty, "更新Client密码失败！");
+                }
+            }
+            return View(resetClientSecretSViewModel);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Client id</param>
+        /// <param name="clientSecrets">重置的密码</param>
+        /// <returns></returns>
+        private async Task<Client> HandleResetClientSecret(int id, List<string> clientSecrets)
+        {
+            var updateClient = await _configurationContext.Clients.Include(a => a.ClientSecrets).Include(a => a.AllowedGrantTypes).SingleOrDefaultAsync(a => a.Id == id);
+            if(updateClient!= null)
+            {
+                var resetClientSecret = new Client
+                {
+                    ClientSecrets = GetClientSecrets(clientSecrets)
+                }.ToEntity();
+                updateClient.ClientSecrets.Clear();
+                updateClient.ClientSecrets = resetClientSecret.ClientSecrets.ToList();
+                 _configurationContext.Clients.Update(updateClient);
+                try
+                {
+                    await _configurationContext.SaveChangesAsync();
+                    return updateClient.ToModel();
+                }
+                catch (Exception)
+                {
+
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
         #endregion
     }
 }
