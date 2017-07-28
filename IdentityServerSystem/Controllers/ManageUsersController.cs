@@ -64,7 +64,7 @@ namespace IdentityServerSystem.Controllers
             {
                 return BadRequest();
             }
-            var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new EditUserViewModel { id = a.Id, DepartmentID = a.DepartmentID, FamilyName = a.FamilyName, FirstName = a.FirstName, Telephone = a.Telephone, UserName = a.UserName }).FirstOrDefaultAsync();
+            var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new EditUserViewModel { id = a.Id, FamilyName = a.FamilyName, FirstName = a.FirstName, Telephone = a.Telephone, UserName = a.UserName }).FirstOrDefaultAsync();
             return View(viewModel);
         }
 
@@ -74,7 +74,7 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userInfo = await UpdateUserInfo(editUserViewModel.id, editUserViewModel.DepartmentID, editUserViewModel.FamilyName, editUserViewModel.FirstName, editUserViewModel.Telephone);
+                var userInfo = await UpdateUserInfo(editUserViewModel.id, editUserViewModel.FamilyName, editUserViewModel.FirstName, editUserViewModel.Telephone);
                 if (userInfo != null)
                 {
                     return RedirectToAction(nameof(ListUsers));
@@ -83,13 +83,12 @@ namespace IdentityServerSystem.Controllers
             return View(editUserViewModel);
         }
 
-        private async Task<ApplicationUser> UpdateUserInfo(Guid id, Guid? departmentID, string familyName, string firstName, string telephone)
+        private async Task<ApplicationUser> UpdateUserInfo(Guid id, string familyName, string firstName, string telephone)
         {
 
             var userInfo = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == id);
             if (userInfo != null)
-            {
-                userInfo.DepartmentID = departmentID;
+            {                
                 userInfo.FamilyName = familyName;
                 userInfo.FirstName = firstName;
                 userInfo.Telephone = telephone;
@@ -123,7 +122,7 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var newUserInfo = await CreateNewUser(createUserViewModel.UserName, createUserViewModel.Password, createUserViewModel.DepartmentID, createUserViewModel.FamilyName, createUserViewModel.FirstName, createUserViewModel.Telephone);
+                var newUserInfo = await CreateNewUser(createUserViewModel.UserName, createUserViewModel.Password,  createUserViewModel.FamilyName, createUserViewModel.FirstName, createUserViewModel.Telephone);
 
                 if (newUserInfo != null)
                 {
@@ -144,10 +143,10 @@ namespace IdentityServerSystem.Controllers
         /// <param name="firstName">名字</param>
         /// <param name="telephone">电话号码</param>
         /// <returns></returns>
-        private async Task<ApplicationUser> CreateNewUser(string userName, string password, Guid? departmentID, string familyName, string firstName, string telephone)
+        private async Task<ApplicationUser> CreateNewUser(string userName, string password,  string familyName, string firstName, string telephone)
         {
             //先创建一个新的ApplicationUser，看是否成功，成功返回该用户信息
-            var user = new ApplicationUser { Id=Guid.NewGuid(), UserName = userName, DepartmentID = departmentID, FamilyName = familyName, FirstName = firstName, Telephone = telephone };
+            var user = new ApplicationUser { Id=Guid.NewGuid(), UserName = userName,  FamilyName = familyName, FirstName = firstName, Telephone = telephone };
             var result = await _userManager.CreateAsync(user, password);
            
             if (result.Succeeded)
@@ -211,7 +210,7 @@ namespace IdentityServerSystem.Controllers
         /// <returns></returns>
         public async Task<IActionResult> ListUsers()
         {
-            var viewModel = await _userManager.Users.Include(a => a.ApplicationDepartment).ToListAsync();
+            var viewModel = await _userManager.Users.ToListAsync();
             return View(viewModel);
         }
         #endregion

@@ -25,9 +25,7 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Telephone)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ApplicationDepartment)
-                </th>
+               
                 <th></th>
             </tr>
         </thead>
@@ -47,9 +45,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Telephone)
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ApplicationDepartment.DepartmentName)
-                    </td>
+                   
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">编辑</a> |
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">详情</a> |

@@ -21,12 +21,7 @@ namespace IdentityServerSystem.Models
         
         [Display(Name = "电话号码")]
         public string Telephone { get; set; }
-        public Guid? DepartmentID { get; set; }
-
-        [Display(Name = "所属科室")]
-
-        [ForeignKey("DepartmentID")]
-        public ApplicationDepartment ApplicationDepartment { get; set; }
+       
 
         [Display(Name = "姓名")]
         public string FullName

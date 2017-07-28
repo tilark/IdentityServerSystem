@@ -1,5 +1,4 @@
 ﻿@model IdentityServerSystem.Models.ManageUserViewModels.EditUserViewModel
-@inject IdentityServerSystem.Services.DropDownListService dropDownListService
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -32,10 +31,7 @@
                 <div class="col-md-4">
                     <input asp-for="Telephone" class="form-control">
                 </div>
-                <label asp-for="DepartmentID" class="col-md-2 control-label"></label>
-                <div class="col-md-4">
-                    <select asp-for="DepartmentID" asp-items="@dropDownListService.GetDepartmentDropDownList()" class="form-control multiple-bind-select2"></select>
-                </div>
+                
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">

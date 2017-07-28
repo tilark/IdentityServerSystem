@@ -22,8 +22,7 @@ namespace IdentityServerSystem.Models.ManageUserViewModels
         [Display(Name = "电话号码")]
         public string Telephone { get; set; }
 
-        [Display(Name = "所属科室")]
-        public Guid? DepartmentID { get; set; }
+      
 
     }
 }

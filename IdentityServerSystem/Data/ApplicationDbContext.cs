@@ -14,7 +14,7 @@ namespace IdentityServerSystem.Data
             : base(options)
         {
         }
-        public virtual DbSet<ApplicationDepartment> ApplicationDepartments { get; set; }
+        //public virtual DbSet<ApplicationDepartment> ApplicationDepartments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

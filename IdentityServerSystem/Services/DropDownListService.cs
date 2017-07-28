@@ -8,7 +8,7 @@ using IdentityServerSystem.Data;
 
 namespace IdentityServerSystem.Services
 {
-    public class DropDownListService : IDropDownListService
+    public class DropDownListService 
     {
         private readonly ApplicationDbContext _context;
         private IMemoryCache _cache;

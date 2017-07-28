@@ -11,6 +11,13 @@
   <PropertyGroup>
     <UserSecretsId>aspnet-IdentityServerSystem-88c7d637-6021-4e35-acc9-cac9d9d6ce39</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\ApplicationDepartmentsController.cs" />
+    <Compile Remove="Models\ApplicationDepartment.cs" />
+    <Compile Remove="Services\DropDownListService.cs" />
+    <Compile Remove="Services\IDropDownListService.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="automapper" Version="6.1.1" />
     <PackageReference Include="IdentityServer4" Version="1.5.2" />

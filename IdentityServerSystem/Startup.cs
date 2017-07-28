@@ -92,7 +92,7 @@ namespace IdentityServerSystem
             });
             //services.AddTransient<IProfileService, ProfileService>();
             //services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
-            services.AddScoped<DropDownListService>();
+            //services.AddScoped<DropDownListService>();
             services.AddScoped<ConfigDbContextDropDownListService>();
 
         }
