@@ -104,11 +104,17 @@ namespace IdentityServerSystem.Controllers
         private async Task<ApplicationUser> CreateNewUser(Guid Id, string userName, string password, string familyName, string firstName, string telephone)
         {
             //先创建一个新的ApplicationUser，看是否成功，成功返回该用户信息
-            var user = new ApplicationUser { Id = Id, UserName = userName, FamilyName = familyName, FirstName = firstName, Telephone = telephone };
+            var user = new ApplicationUser { Id = Id, UserName = userName, FamilyName = familyName, FirstName = firstName, Telephone = telephone};
             var result = await _userManager.CreateAsync(user, password);
-
+           
             if (result.Succeeded)
             {
+                await _userManager.AddClaimsAsync(user, new Claim[]
+                {
+                    new Claim("family_name", familyName),
+                    new Claim("given_name", firstName),
+                    new Claim("preferred_username", user.FullName)
+                });
                 return user;
             }
             else

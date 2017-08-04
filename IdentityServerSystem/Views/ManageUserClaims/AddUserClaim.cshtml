@@ -42,7 +42,9 @@
         <div class="form-group">
             <label class="col-md-2">选择IdentityResource</label>
             <div class="col-md-10">
-                <select asp-items="@configContextDropDownListService.GetIdentityResourceIDDropDownList()" class="form-control multiple-bind-select2" id="get-identity-resource-select" onchange="getIdentityResourceSelect(this.value)"></select>
+                <select asp-items="@configContextDropDownListService.GetIdentityResourceIDDropDownList()" class="form-control multiple-bind-select2" id="get-identity-resource-select" onchange="getIdentityResourceSelect(this.value)">
+                    <option label="">-请选择-</option>
+                </select>
             </div>
         </div>
     </div>

@@ -115,23 +115,27 @@ namespace IdentityServerSystem.Controllers
         /// <returns></returns>
         private async Task<ApplicationUser> AddUserClaimToUser(Guid id, IDictionary<string, string> planAddUserClaimDict)
         {
-            var userModel = await _userManager.Users.Include(a => a.Claims).Where(a => a.Id == id).FirstOrDefaultAsync();
-            if (userModel != null)
+            var user = await _userManager.Users.Include(a => a.Claims).Where(a => a.Id == id).FirstOrDefaultAsync();
+            if (user != null)
             {
                 foreach (var planUserClaim in planAddUserClaimDict)
                 {
-                    if (userModel.Claims.All(a => a.ClaimType != planUserClaim.Key))
+                    if (user.Claims.All(a => a.ClaimType != planUserClaim.Key))
                     {
-                        //UserClaim中不包含计划添加的，则需添加
-                        var newClaim = new Claim(planUserClaim.Key, planUserClaim.Value);
-                        await _userManager.AddClaimAsync(userModel, newClaim);
+                        //UserClaim中不包含计划添加的，且Value不能为null，则需添加
+                        if(planUserClaim.Value != null)
+                        {
+                            var newClaim = new Claim(planUserClaim.Key, planUserClaim.Value);
+                            await _userManager.AddClaimAsync(user, newClaim);
+                        }
+                       
                     }
                     else
                     {
                         ModelState.AddModelError("PlanAddUserClaimDict", $"UserClaimType:{planUserClaim.Key}已经存在！无法再添加");
                     }
                 }
-                return userModel;
+                return user;
             }
             else
             {
