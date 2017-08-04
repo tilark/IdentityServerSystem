@@ -1,0 +1,40 @@
+﻿@model IdentityServerSystem.Models.ManageUserViewModels.ChangeUserAccountViewModel
+@{
+    ViewData["Title"] = "ChangeUserAccount";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<fieldset class="col-md-12 panel panel-default">
+    <legend class="text-blue">更改密码</legend>
+    <form asp-controller="ManageUsers" asp-action="ChangeUserAccount" method="post" class="form-horizontal">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input asp-for="Id" type="hidden" />
+        <div class="form-group">
+            <label asp-for="UserName" class="col-md-2 control-label"></label>
+            <div class="col-md-4">
+                <input asp-for="UserName" class="form-control" readonly />
+            </div>
+        </div>
+        <div class="form-group">
+
+            <label asp-for="NewUserName" class="col-md-2 control-label"></label>
+            <div class="col-md-4">
+                <input asp-for="NewUserName" class="form-control" />
+                <span asp-validation-for="NewUserName" class="text-danger"></span>
+            </div>
+        </div>       
+      
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button type="submit" class="btn btn-primary">更改登陆帐号</button>
+                <a asp-action="ListUsers" class="btn btn-warning">取消</a>
+
+            </div>
+        </div>
+    </form>
+
+</fieldset>
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

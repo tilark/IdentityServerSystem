@@ -8,6 +8,9 @@ namespace IdentityServerSystem.Models.ManageUserViewModels
 {
     public class CreateUserViewModel
     {
+        [Display(Name = "Id")]
+        public Guid Id { get; set; }
+
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "帐号")]
         public string UserName { get; set; }

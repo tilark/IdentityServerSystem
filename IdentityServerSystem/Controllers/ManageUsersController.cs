@@ -52,6 +52,76 @@ namespace IdentityServerSystem.Controllers
             return View();
         }
 
+        #region 用户列表
+        /// <summary>
+        /// 用户列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> ListUsers()
+        {
+            var viewModel = await _userManager.Users.ToListAsync();
+            return View(viewModel);
+        }
+        #endregion
+
+        #region 新建用户
+        /// <summary>
+        /// 新增用户
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult AddUser()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> AddUser(CreateUserViewModel createUserViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var newUserInfo = await CreateNewUser(createUserViewModel.Id, createUserViewModel.UserName, createUserViewModel.Password, createUserViewModel.FamilyName, createUserViewModel.FirstName, createUserViewModel.Telephone);
+
+                if (newUserInfo != null)
+                {
+                    //创建未成功，返回创建页面，需重新创建
+                    return RedirectToAction("ListUsers");
+                }
+            }
+            return View(createUserViewModel);
+        }
+
+        /// <summary>
+        /// 创建新用户
+        /// </summary>
+        /// <param name="userName">登陆帐号</param>
+        /// <param name="password">登陆密码</param>
+        /// <param name="departmentID">人员所在科室</param>
+        /// <param name="familyName">姓氏</param>
+        /// <param name="firstName">名字</param>
+        /// <param name="telephone">电话号码</param>
+        /// <returns></returns>
+        private async Task<ApplicationUser> CreateNewUser(Guid Id, string userName, string password, string familyName, string firstName, string telephone)
+        {
+            //先创建一个新的ApplicationUser，看是否成功，成功返回该用户信息
+            var user = new ApplicationUser { Id = Id, UserName = userName, FamilyName = familyName, FirstName = firstName, Telephone = telephone };
+            var result = await _userManager.CreateAsync(user, password);
+
+            if (result.Succeeded)
+            {
+                return user;
+            }
+            else
+            {
+                AddErrors(result);
+                //不成功，返回null
+                return null;
+            }
+        }
+
+       
+        #endregion
+
         #region 编辑用户
         /// <summary>
         /// 编辑用户信息
@@ -104,71 +174,7 @@ namespace IdentityServerSystem.Controllers
             }
             return null;
         }
-        #endregion
-
-        #region 新建用户
-        /// <summary>
-        /// 新增用户
-        /// </summary>
-        /// <returns></returns>
-        public IActionResult AddUser()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> AddUser(CreateUserViewModel createUserViewModel)
-        {
-            if (ModelState.IsValid)
-            {
-                var newUserInfo = await CreateNewUser(createUserViewModel.UserName, createUserViewModel.Password,  createUserViewModel.FamilyName, createUserViewModel.FirstName, createUserViewModel.Telephone);
-
-                if (newUserInfo != null)
-                {
-                    //创建未成功，返回创建页面，需重新创建
-                    return RedirectToAction("ListUsers");
-                }
-            }
-            return View(createUserViewModel);
-        }
-
-        /// <summary>
-        /// 创建新用户
-        /// </summary>
-        /// <param name="userName">登陆帐号</param>
-        /// <param name="password">登陆密码</param>
-        /// <param name="departmentID">人员所在科室</param>
-        /// <param name="familyName">姓氏</param>
-        /// <param name="firstName">名字</param>
-        /// <param name="telephone">电话号码</param>
-        /// <returns></returns>
-        private async Task<ApplicationUser> CreateNewUser(string userName, string password,  string familyName, string firstName, string telephone)
-        {
-            //先创建一个新的ApplicationUser，看是否成功，成功返回该用户信息
-            var user = new ApplicationUser { Id=Guid.NewGuid(), UserName = userName,  FamilyName = familyName, FirstName = firstName, Telephone = telephone };
-            var result = await _userManager.CreateAsync(user, password);
-           
-            if (result.Succeeded)
-            {
-                return user;
-            }
-            else
-            {
-                AddErrors(result);
-                //不成功，返回null
-                return null;
-            }
-        }
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-        }
-        #endregion
+        #endregion        
 
         #region 删除用户
         public async Task<IActionResult> DeleteUser(Guid? id)
@@ -202,18 +208,7 @@ namespace IdentityServerSystem.Controllers
                 return View(user);
             }
         }
-        #endregion
-        #region 用户列表
-        /// <summary>
-        /// 用户列表
-        /// </summary>
-        /// <returns></returns>
-        public async Task<IActionResult> ListUsers()
-        {
-            var viewModel = await _userManager.Users.ToListAsync();
-            return View(viewModel);
-        }
-        #endregion
+        #endregion       
 
         #region 用户详情
         public async Task<IActionResult> Details(Guid? id)
@@ -300,6 +295,60 @@ namespace IdentityServerSystem.Controllers
                 return RedirectToAction(nameof(ListUsers), new { Message = ManageMessageId.Error });
             }
             return View(resetUserPasswordViewModel);
+        }
+        #endregion
+
+        #region 更改用户登陆帐号
+        /// <summary>
+        /// 更改用户的登陆帐号
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task <IActionResult> ChangeUserAccount(Guid? id)
+        {
+            if (!id.HasValue || id.Value.Equals(Guid.Empty))
+            {
+                return BadRequest();
+            }
+            var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new ChangeUserAccountViewModel { Id = a.Id, UserName = a.UserName }).FirstOrDefaultAsync();
+            return View(viewModel);
+        }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> ChangeUserAccount(ChangeUserAccountViewModel changeUserAccountViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == changeUserAccountViewModel.Id);
+                if (user != null)
+                {
+                    var result = await _userManager.SetUserNameAsync(user, changeUserAccountViewModel.NewUserName);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction(nameof(ListUsers));
+
+                    }
+                    else
+                    {
+                        AddErrors(result);
+                    }
+                }
+                else
+                {
+                    return RedirectToAction(nameof(ListUsers), new { Message = ManageMessageId.Error });
+                }
+            }
+            return View(changeUserAccountViewModel);
+        }
+        #endregion
+
+        #region Private method
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
         }
         #endregion
     }
