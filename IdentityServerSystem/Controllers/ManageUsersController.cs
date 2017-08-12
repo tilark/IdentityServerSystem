@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using IdentityServerSystem.Models.ManageUserViewModels;
 using static IdentityServerSystem.Controllers.ManageController;
 using System.Security.Claims;
+using IdentityServerSystem.Models.ManageUserClaimViewModels;
 
 namespace IdentityServerSystem.Controllers
 {
@@ -22,7 +23,8 @@ namespace IdentityServerSystem.Controllers
     /// 管理用户信息，新增用户、更改用户信息、更改或重置用户密码、删除用户信息
     /// </summary>
     /// 
-   
+
+    [Authorize(Policy = "AdminUser")]
     public class ManageUsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -65,6 +67,7 @@ namespace IdentityServerSystem.Controllers
         #endregion
 
         #region 新建用户
+        [Authorize(Policy = "Administrator")]
         /// <summary>
         /// 新增用户
         /// </summary>
@@ -74,13 +77,15 @@ namespace IdentityServerSystem.Controllers
             return View();
         }
 
+        [Authorize(Policy = "Administrator")]
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> AddUser(CreateUserViewModel createUserViewModel)
         {
             if (ModelState.IsValid)
             {
-                var newUserInfo = await CreateNewUser(createUserViewModel.Id, createUserViewModel.UserName, createUserViewModel.Password, createUserViewModel.FamilyName, createUserViewModel.FirstName, createUserViewModel.Telephone);
+                //var newUserInfo = await CreateNewUser(createUserViewModel.Id, createUserViewModel.UserName, createUserViewModel.Password, createUserViewModel.FamilyName, createUserViewModel.FirstName, createUserViewModel.Telephone);
+                var newUserInfo = await createUserViewModel.CreateUserAsync(this._userManager);
 
                 if (newUserInfo != null)
                 {
@@ -104,9 +109,9 @@ namespace IdentityServerSystem.Controllers
         private async Task<ApplicationUser> CreateNewUser(Guid Id, string userName, string password, string familyName, string firstName, string telephone)
         {
             //先创建一个新的ApplicationUser，看是否成功，成功返回该用户信息
-            var user = new ApplicationUser { Id = Id, UserName = userName, FamilyName = familyName, FirstName = firstName, Telephone = telephone};
+            var user = new ApplicationUser { Id = Id, UserName = userName, FamilyName = familyName, FirstName = firstName, Telephone = telephone };
             var result = await _userManager.CreateAsync(user, password);
-           
+
             if (result.Succeeded)
             {
                 await _userManager.AddClaimsAsync(user, new Claim[]
@@ -115,6 +120,15 @@ namespace IdentityServerSystem.Controllers
                     new Claim("given_name", firstName),
                     new Claim("preferred_username", user.FullName)
                 });
+
+                //如果是UserName是“Administrator"，添加"Administrator"的UserClaim
+                if (String.Equals(userName, "Administrator"))
+                {
+                    await _userManager.AddClaimsAsync(user, new Claim[]
+                    {
+                    new Claim("Administrator", "Administrator")
+                    });
+                }
                 return user;
             }
             else
@@ -125,7 +139,7 @@ namespace IdentityServerSystem.Controllers
             }
         }
 
-       
+
         #endregion
 
         #region 编辑用户
@@ -164,14 +178,27 @@ namespace IdentityServerSystem.Controllers
 
             var userInfo = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == id);
             if (userInfo != null)
-            {                
+            {
                 userInfo.FamilyName = familyName;
                 userInfo.FirstName = firstName;
                 userInfo.Telephone = telephone;
                 var result = await _userManager.UpdateAsync(userInfo);
                 if (result.Succeeded)
                 {
-                    return userInfo;
+                    //更改UserClaim
+                    var userClaims = new Dictionary<string, string>();
+                    userClaims.Add("family_name", familyName);
+                    userClaims.Add("given_name", firstName);
+                    userClaims.Add("preferred_username", familyName + firstName);
+                    EditUserClaimViewModel updateUserClaim = new EditUserClaimViewModel
+                    {
+                        Id = id,
+                        UserClaims = userClaims
+
+                    };
+                    var user = await updateUserClaim.UpdateUserClaims(_userManager);
+
+                    return user;
                 }
                 else
                 {
@@ -183,6 +210,8 @@ namespace IdentityServerSystem.Controllers
         #endregion        
 
         #region 删除用户
+
+        [Authorize(Policy = "Administrator")]
         public async Task<IActionResult> DeleteUser(Guid? id)
         {
             if (!id.HasValue && id.Equals(Guid.Empty))
@@ -193,6 +222,7 @@ namespace IdentityServerSystem.Controllers
             return View(user);
         }
 
+        [Authorize(Policy = "Administrator")]
         [HttpPost, ActionName("DeleteUser")]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> DeleteUserConfirmed(Guid id)
@@ -203,16 +233,22 @@ namespace IdentityServerSystem.Controllers
             }
             //删除
             var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == id);
-            var result = await _userManager.DeleteAsync(user);
-            if (result.Succeeded)
+            //不能删除"Administrator"
+            if (user.UserName != "Administrator")
             {
-                return RedirectToAction("ListUsers");
+                var result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListUsers");
+                }
+                else
+                {
+                    AddErrors(result);
+                    return View(user);
+                }
             }
-            else
-            {
-                AddErrors(result);
-                return View(user);
-            }
+            return RedirectToAction("ListUsers");
+
         }
         #endregion       
 
@@ -232,11 +268,11 @@ namespace IdentityServerSystem.Controllers
         #region 更改用户密码
         public async Task<IActionResult> ChangeUserPassword(Guid? id)
         {
-            if(!id.HasValue && id.Value.Equals(Guid.Empty))
+            if (!id.HasValue && id.Value.Equals(Guid.Empty))
             {
                 return BadRequest();
             }
-            var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new ChangeUserPasswordViewModel {id = a.Id, UserName = a.UserName }).FirstOrDefaultAsync();
+            var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new ChangeUserPasswordViewModel { id = a.Id, UserName = a.UserName }).FirstOrDefaultAsync();
 
             return View(viewModel);
         }
@@ -305,12 +341,14 @@ namespace IdentityServerSystem.Controllers
         #endregion
 
         #region 更改用户登陆帐号
+
+        [Authorize(Policy = "Administrator")]
         /// <summary>
         /// 更改用户的登陆帐号
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task <IActionResult> ChangeUserAccount(Guid? id)
+        public async Task<IActionResult> ChangeUserAccount(Guid? id)
         {
             if (!id.HasValue || id.Value.Equals(Guid.Empty))
             {
@@ -319,6 +357,8 @@ namespace IdentityServerSystem.Controllers
             var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new ChangeUserAccountViewModel { Id = a.Id, UserName = a.UserName }).FirstOrDefaultAsync();
             return View(viewModel);
         }
+
+        [Authorize(Policy = "Administrator")]
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> ChangeUserAccount(ChangeUserAccountViewModel changeUserAccountViewModel)

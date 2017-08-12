@@ -9,9 +9,11 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServerSystem.Models.ManageClientViewModels;
 using IdentityServer4.Models;
 using IdentityServer4.EntityFramework.Mappers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IdentityServerSystem.Controllers
 {
+    [Authorize(Policy = "Administrator")]
     /// <summary>
     /// 管理Clients
     /// </summary>
@@ -163,8 +165,8 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updateClient = await EditClient(editClientViewModel.id, editClientViewModel.ClientName, editClientViewModel.RedirectUris, editClientViewModel.PostLogoutRedirectUris, editClientViewModel.AllowedScopes);
-                if(updateClient != null)
+                var updateClient = await editClientViewModel.UpdateClientAsync(_configurationContext);
+                if (updateClient != null)
                 {
                     return RedirectToAction(nameof(Index));
                 }

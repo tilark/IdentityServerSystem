@@ -10,12 +10,15 @@ using IdentityServer4.Models;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IdentityServerSystem.Controllers
 {
     /// <summary>
     /// 管理IdentityResources
     /// </summary>
+    /// 
+    [Authorize(Policy = "Administrator")]
     public class ManageIdentityResourcesController : Controller
     {
         private readonly ConfigurationDbContext _configurationContext;

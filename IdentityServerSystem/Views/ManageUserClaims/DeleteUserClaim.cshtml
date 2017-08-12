@@ -36,6 +36,8 @@
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
+                        <a asp-action="Index" asp-route-id="@Model.Id" class="btn btn-warning">取消</a>
+
                     </div>
                 </div>
             </form>
@@ -43,7 +45,6 @@
         <div class="form-group">
             <h4 id="delete-user-claim-log"></h4>
         </div> 
-        <a asp-action="Index" asp-route-id="@Model.Id">返回列表</a>
     </div>
 </fieldset>
 @section Scripts {

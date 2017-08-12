@@ -1,0 +1,47 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend>从Excel中导入用户信息</legend>
+    <form asp-action="ImportUserInfo" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        <div class="col-md-offset-3">
+            <button type="submit" class="btn btn-primary">导入用户信息</button>
+
+        </div>
+    </form>
+</fieldset>
+
+<div class="col-md-12 panel panel-warning">
+    <div class="panel-heading">注意事项</div>
+    <div class="panel-body">
+        <h3>仅支持Excel2007格式，表格格式如下:</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>姓名</td>
+                    <td>工号</td>
+                    <td>科室</td>
+                    <td>性别</td>
+                    <td>人员类型</td>
+                    <td>已删除</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-toggle="tooltip" data-placement="right" title="类型为Guid">a3c6a1b9-8e54-46c9-a864-002b2cfc639e</td>
+                    <td>张三</td>
+                    <td>9999</td>
+                    <td>急诊内科</td>
+                    <td>男</td>
+                    <td>医生</td>
+                    <td>FALSE</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -17,6 +17,8 @@ using IdentityServer4.Validation;
 using IdentityServer4.Services;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
+using Microsoft.AspNetCore.Identity;
+using IdentityServerSystem.Models.GetUserInfoFromWebApiViewModels;
 
 namespace IdentityServerSystem
 {
@@ -90,10 +92,19 @@ namespace IdentityServerSystem
                 options.Lockout.AllowedForNewUsers = true;
               
             });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Administrator", policy => policy.RequireClaim("Administrator", "Administrator"));
+                options.AddPolicy("AdminUser", policy => policy.RequireClaim("Administrator", "Administrator", "AdminUser"));
+
+            });
             //services.AddTransient<IProfileService, ProfileService>();
             //services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
             //services.AddScoped<DropDownListService>();
             services.AddScoped<ConfigDbContextDropDownListService>();
+
+            //添加Configuration
+            services.Configure<HumanResourceIdentityOption>(Configuration.GetSection("HumanResourceSystemIdentity"));
 
         }
 
@@ -167,6 +178,14 @@ namespace IdentityServerSystem
                     }
                     context.SaveChanges();
                 }
+
+                //初始化创建Administrator用户
+                // First apply pendding migrations if exist
+                serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
+
+                // Then call seeder method
+                var userManager = serviceScope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
+                serviceScope.ServiceProvider.GetService<ApplicationDbContext>().EnsureSeedData(userManager);
             }
         }
     }

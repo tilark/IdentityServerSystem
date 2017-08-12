@@ -10,19 +10,16 @@
     <p>
         <a asp-action="AddUser">创建新用户</a>
     </p>
-    <table class="table" id="table_id">
+    <table class="table table-hover" id="table_id">
         <thead>
             <tr>
-                <th>
+                <th style="width:10px;">
                     @Html.DisplayNameFor(model => model.UserName)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.FullName)
                 </th>
-               
-                <th>
-                    @Html.DisplayNameFor(model => model.Email)
-                </th>
+
                 <th>
                     @Html.DisplayNameFor(model => model.Telephone)
                 </th>
@@ -41,10 +38,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.FullName)
                     </td>
-                   
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
+
                     <td>
                         @Html.DisplayFor(modelItem => item.Telephone)
                     </td>

@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using IdentityModel.Client;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IdentityServerSystem.Controllers
 {
+    [Authorize(Policy = "Administrator")]
     /// <summary>
     /// 测试从Web Api中获取数据
     /// </summary>

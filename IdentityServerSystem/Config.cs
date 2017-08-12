@@ -21,7 +21,8 @@ namespace IdentityServerSystem
         {
             return new List<ApiResource>
             {
-                new ApiResource("scope.readaccess", "Example API")                
+                new ApiResource("scope.readaccess", "Example API"),
+                new ApiResource("humanresourcesystem", "人力资源系统资源")
             };
 
         }

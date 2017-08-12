@@ -51,18 +51,21 @@
                     </li>
                 </ul>
             }
-          
+             @if (User.HasClaim(a => a.Type == "Administrator"))
+             {
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="ApplicationDepartments" asp-action="Index">科室管理</a></li>    
-                    <li><a asp-area="" asp-controller="ManageUsers" asp-action="ListUsers">人员管理</a></li>
-                    <li><a asp-area="" asp-controller="ManageIdentityResources" asp-action="Index">IdentityResources</a></li>
-                    <li><a asp-area="" asp-controller="ManageClients" asp-action="Index">Clients</a></li>
-                    <li><a asp-area="" asp-controller="ManageApiResources" asp-action="Index">ApiResources</a></li>
-                    <li><a asp-area="" asp-controller="GetDepartmentFromWebApi" asp-action="Index">从WebApi获取资源</a></li>
-
-
-                    
+                    <li><a asp-area="" asp-controller="ManageUsers" asp-action="Index">人员管理</a></li>
+                    @if (User.HasClaim(a => a.Value == "Administrator"))
+                    {
+                        <li><a asp-area="" asp-controller="ManageIdentityResources" asp-action="Index">IdentityResources</a></li>
+                        <li><a asp-area="" asp-controller="ManageClients" asp-action="Index">Clients</a></li>
+                        <li><a asp-area="" asp-controller="ManageApiResources" asp-action="Index">ApiResources</a></li>
+                        <li><a asp-area="" asp-controller="GetDepartmentFromWebApi" asp-action="Index">从WebApi获取资源</a></li>
+                    }
+                   
                 </ul>
+             }
+                
                 @Html.Partial("_LoginPartial")
             
                 

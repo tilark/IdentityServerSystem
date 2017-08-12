@@ -8,16 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using IdentityServerSystem.Models;
-using IdentityServerSystem.Models.ManageViewModels;
 using IdentityServerSystem.Services;
-using IdentityServerSystem.Data;
 using Microsoft.EntityFrameworkCore;
-using IdentityServerSystem.Models.ManageUserViewModels;
 using System.Security.Claims;
 using IdentityServerSystem.Models.ManageUserClaimViewModels;
 
 namespace IdentityServerSystem.Controllers
 {
+    [Authorize(Policy = "Administrator")]
     public class ManageUserClaimsController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -98,7 +96,9 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await AddUserClaimToUser(addUserClaimViewModel.Id, addUserClaimViewModel.PlanAddUserClaimDict);
+                //ApplicationUser user = await AddUserClaimToUser(addUserClaimViewModel.Id, addUserClaimViewModel.PlanAddUserClaimDict);
+                ApplicationUser user = await addUserClaimViewModel.AddUserClaims(_userManager);
+
                 if (user != null)
                 {
                     return RedirectToAction(nameof(Index), new { id = user.Id });
@@ -183,7 +183,9 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await EditUserClaimToUser(editUserClaimViewModel.Id, editUserClaimViewModel.UserClaims);
+                //ApplicationUser user = await EditUserClaimToUser(editUserClaimViewModel.Id, editUserClaimViewModel.UserClaims);
+                ApplicationUser user = await editUserClaimViewModel.UpdateUserClaims(_userManager);
+
                 if (user != null)
                 {
                     return RedirectToAction(nameof(Index), new { id = user.Id });
@@ -279,7 +281,7 @@ namespace IdentityServerSystem.Controllers
             if(userModel != null)
             {
                 var userClaim = userModel.Claims.FirstOrDefault(a => a.ClaimType == userClaimType);
-                if(userClaim != null)
+                if(userClaim != null && userModel.UserName != "Administrator" && userClaim.ClaimType != "Administrator")
                 {                   
                     var removeResult =await _userManager.RemoveClaimAsync(userModel, userClaim.ToClaim());
                     result= removeResult.Succeeded;

@@ -9,10 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using IdentityServerSystem.Models.ManageApiResourceViewModels;
 using IdentityServer4.Models;
 using IdentityServer4.EntityFramework.Mappers;
+using Microsoft.AspNetCore.Authorization;
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace IdentityServerSystem.Controllers
 {
+    [Authorize(Policy = "Administrator")]
     /// <summary>
     /// 管理Api Resource
     /// </summary>
