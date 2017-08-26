@@ -12,7 +12,7 @@ namespace IdentityServerSystem.Models.GetUserInfoFromWebApiViewModels
         public Guid userId { get; set; }
         public string employeeNo { get; set; }
         public string userName { get; set; }
-        public Guid department { get; set; }
+        public bool deleted { get; set; }
 
     }
 }

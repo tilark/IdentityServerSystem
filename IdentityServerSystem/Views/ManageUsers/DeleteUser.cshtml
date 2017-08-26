@@ -1,35 +1,36 @@
-﻿@model IdentityServerSystem.Models.ApplicationUser
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<dl class="dl-horizontal">
-    <dt>
-        @Html.DisplayNameFor(model => model.Id)
-    </dt>
-    <dd>
-        @Html.DisplayFor(model => model.Id)
-    </dd>
-    <dt>
-        @Html.DisplayNameFor(model => model.UserName)
-    </dt>
-    <dd>
-        @Html.DisplayFor(model => model.UserName)
-    </dd>
-    <dt>
-        @Html.DisplayNameFor(model => model.FullName)
-    </dt>
-    <dd>
-        @Html.DisplayFor(model => model.FullName)
-    </dd>
-    <dt></dt>
-    <dd>
-        <form asp-action="DeleteUser" asp-route-id="@Model.Id" method="post">
-            <div class="col-md-offset-2 col-md-10">
-                <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span>&nbsp;确认删除</button>
-                <a asp-action="ListUsers" class="btn btn-warning">取消</a>
-            </div>
-        </form>
-    </dd>
-</dl>
+﻿@model IdentityServerSystem.Models.ManageUserViewModels.DeleteUserViewModel
+    @*
+        For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+    *@
+    @{
+    }
+    <form method="post" asp-action="DeleteUser" asp-controller="ManageUsers">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Id)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Id)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.UserName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserName)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.FullName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.FullName)
+            </dd>
+            <dt></dt>
+            <dd>
+
+                <div class="col-md-offset-2 col-md-10">
+                    <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span>&nbsp;确认删除</button>
+                    <a asp-action="ListUsers" class="btn btn-warning">取消</a>
+                </div>
+            </dd>
+        </dl>
+    </form>

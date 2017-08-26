@@ -84,7 +84,7 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                //var newUserInfo = await CreateNewUser(createUserViewModel.Id, createUserViewModel.UserName, createUserViewModel.Password, createUserViewModel.FamilyName, createUserViewModel.FirstName, createUserViewModel.Telephone);
+                
                 var newUserInfo = await createUserViewModel.CreateUserAsync(this._userManager);
 
                 if (newUserInfo != null)
@@ -94,50 +94,7 @@ namespace IdentityServerSystem.Controllers
                 }
             }
             return View(createUserViewModel);
-        }
-
-        /// <summary>
-        /// 创建新用户
-        /// </summary>
-        /// <param name="userName">登陆帐号</param>
-        /// <param name="password">登陆密码</param>
-        /// <param name="departmentID">人员所在科室</param>
-        /// <param name="familyName">姓氏</param>
-        /// <param name="firstName">名字</param>
-        /// <param name="telephone">电话号码</param>
-        /// <returns></returns>
-        private async Task<ApplicationUser> CreateNewUser(Guid Id, string userName, string password, string familyName, string firstName, string telephone)
-        {
-            //先创建一个新的ApplicationUser，看是否成功，成功返回该用户信息
-            var user = new ApplicationUser { Id = Id, UserName = userName, FamilyName = familyName, FirstName = firstName, Telephone = telephone };
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (result.Succeeded)
-            {
-                await _userManager.AddClaimsAsync(user, new Claim[]
-                {
-                    new Claim("family_name", familyName),
-                    new Claim("given_name", firstName),
-                    new Claim("preferred_username", user.FullName)
-                });
-
-                //如果是UserName是“Administrator"，添加"Administrator"的UserClaim
-                if (String.Equals(userName, "Administrator"))
-                {
-                    await _userManager.AddClaimsAsync(user, new Claim[]
-                    {
-                    new Claim("Administrator", "Administrator")
-                    });
-                }
-                return user;
-            }
-            else
-            {
-                AddErrors(result);
-                //不成功，返回null
-                return null;
-            }
-        }
+        }       
 
 
         #endregion
@@ -154,7 +111,7 @@ namespace IdentityServerSystem.Controllers
             {
                 return BadRequest();
             }
-            var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new EditUserViewModel { id = a.Id, FamilyName = a.FamilyName, FirstName = a.FirstName, Telephone = a.Telephone, UserName = a.UserName }).FirstOrDefaultAsync();
+            var viewModel = await _userManager.Users.Where(a => a.Id == id.Value).Select(a => new EditUserViewModel { Id = a.Id, FamilyName = a.FamilyName, FirstName = a.FirstName, Telephone = a.Telephone, UserName = a.UserName }).FirstOrDefaultAsync();
             return View(viewModel);
         }
 
@@ -164,7 +121,8 @@ namespace IdentityServerSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userInfo = await UpdateUserInfo(editUserViewModel.id, editUserViewModel.FamilyName, editUserViewModel.FirstName, editUserViewModel.Telephone);
+                //var userInfo = await UpdateUserInfo(editUserViewModel.id, editUserViewModel.FamilyName, editUserViewModel.FirstName, editUserViewModel.Telephone);
+                var userInfo = await editUserViewModel.UpdateUserInfo(_userManager);
                 if (userInfo != null)
                 {
                     return RedirectToAction(nameof(ListUsers));
@@ -219,36 +177,31 @@ namespace IdentityServerSystem.Controllers
                 return BadRequest();
             }
             var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == id.Value);
-            return View(user);
+            if(user != null)
+            {
+                var viewModel = new DeleteUserViewModel { Id = user.Id, UserName = user.UserName, FamilyName = user.FamilyName, FirstName = user.FirstName };
+                return View(viewModel);
+            }
+            return BadRequest();
         }
 
-        [Authorize(Policy = "Administrator")]
-        [HttpPost, ActionName("DeleteUser")]
+        [Authorize(Policy = "Administrator")]        
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> DeleteUserConfirmed(Guid id)
+        public async Task<IActionResult> DeleteUser(DeleteUserViewModel deleteUserViewModel)
         {
-            if (id.Equals(Guid.Empty))
+            if (deleteUserViewModel.Id.Equals(Guid.Empty))
             {
                 return BadRequest();
             }
-            //删除
-            var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == id);
-            //不能删除"Administrator"
-            if (user.UserName != "Administrator")
+            var userResult = await deleteUserViewModel.DeleteUserAsync(_userManager);
+            if (userResult != null && userResult.Succeeded)
             {
-                var result = await _userManager.DeleteAsync(user);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ListUsers");
-                }
-                else
-                {
-                    AddErrors(result);
-                    return View(user);
-                }
+                return RedirectToAction("ListUsers");
             }
-            return RedirectToAction("ListUsers");
-
+            else
+            {
+                return View(deleteUserViewModel);
+            }
         }
         #endregion       
 
@@ -364,11 +317,10 @@ namespace IdentityServerSystem.Controllers
         public async Task<IActionResult> ChangeUserAccount(ChangeUserAccountViewModel changeUserAccountViewModel)
         {
             if (ModelState.IsValid)
-            {
-                var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == changeUserAccountViewModel.Id);
-                if (user != null)
+            {               
+                var result = await changeUserAccountViewModel.ChangeUserAccountAsync(_userManager);
+                if(result != null)
                 {
-                    var result = await _userManager.SetUserNameAsync(user, changeUserAccountViewModel.NewUserName);
                     if (result.Succeeded)
                     {
                         return RedirectToAction(nameof(ListUsers));

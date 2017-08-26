@@ -78,6 +78,20 @@
         @RenderBody()
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="loadingModal">请稍后</h4>
+                </div>
+                <div class="modal-body">
+                    <img class="icon" src="~/ajax-loader.gif">&nbsp; 正在处理，请耐心等候，勿关闭窗口...
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/jquery.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     @RenderSection("scripts", required: false)

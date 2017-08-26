@@ -1,0 +1,36 @@
+﻿@model IdentityServerSystem.Models.GetUserInfoFromWebApiViewModels.HandleWebApiCotentResult
+@{
+    ViewData["Title"] = "处理人力资源系统人员信息结果";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend>处理从人力资源系统获取到的人员信息的结果列表</legend>
+    @if(Model != null)
+    {
+        <dl class="dl-horizontal">
+            <dt>从人力资源系统获取人员信息的成功状态：</dt>
+            <dd>@Model.Successed</dd>
+            @if (Model.Successed == false)
+            {
+                <dt>错误信息为：</dt>
+                <dd>@Model.ErrorMessage</dd>
+            }
+            else
+            {
+                <dt>共需处理：</dt>
+                <dd>@Model.TotalContentCount 条信息</dd>
+                <dt>成功处理：</dt>
+                <dd>@Model.SuccessCount 条信息</dd>
+                <dt>失败处理：</dt>
+                <dd>@Model.FailedCount 条信息</dd>
+            }
+        </dl>
+        
+
+    }
+    <div class="col-md-offset-2">
+        <a asp-action="GetUserInfoFromHumanResourceSystem" class="btn btn-warning">返回</a>
+    </div>
+</fieldset>
+

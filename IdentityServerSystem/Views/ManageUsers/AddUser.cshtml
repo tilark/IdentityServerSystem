@@ -8,7 +8,7 @@
     <legend class="text-blue">创建新用户</legend>
     <div asp-validation-summary="All" class="text-danger"></div>
 
-    <form asp-action="AddUser" asp-controller="ManageUsers">
+    <form asp-action="AddUser" asp-controller="ManageUsers" method="post">
         <div class="form-horizontal">
             <div class="form-group">
                 <label asp-for="Id" class="col-md-2 control-label"></label>

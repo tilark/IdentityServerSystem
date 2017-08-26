@@ -3,13 +3,46 @@
 *@
 @{
 }
-<div class="btn-danger">
-    @ViewBag.ErrorMessage
-</div>
+
+<h3>从人力资源系统中获取人员信息</h3>
+<fieldset class="col-md-12 panel panel-default">
+    <legend>创建人员帐号信息</legend>
+    <form method="post" asp-action="CreateUserIfNotExistFromWebApi">
+        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#loadingModal" data-backdrop="static" data-keyboard=false>创建</button>
+    </form>
+    <div class="col-md-12">
+        <h4>说明:</h4>
+        <p>
+            从WebApi中获取人员信息中删除标志为false的人员列表，帐号是用户工号，密码是123456，User Id与WebApi
+            中的User Id相同，同时创建Claims:family_name, given_name, preferred_username。
+        </p>
+    </div>
+</fieldset>
+<fieldset class="col-md-12 panel panel-default">
+    <legend>更新人员信息</legend>
+    <form method="post" asp-action="UpdatePersonInfoFromWebApi">
+        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#loadingModal" data-backdrop="static" data-keyboard=false>更新</button>
+    </form>
+    <div class="col-md-12">
+        <h4>说明:</h4>
+        <p>
+            查询数据库中是否存在该用户，如果存在，则修改用户的姓名及相应的Claims：family_name, given_name, preferred_username，保持登录帐号不变。
+        </p>
+    </div>
+</fieldset>
 
 <fieldset class="col-md-12 panel panel-default">
-    <legend>从人力资源系统中获取人员信息</legend>
-    <form method="get" asp-action="GetUserInfoFromHumanResourceSystemPost">
-        <button type="submit" class="btn btn-primary">获取人员信息并存入数据库</button>
+    <legend>修改人员登录帐号</legend>
+    <form method="post" asp-action="UpdatePersonInfoAccountFromWebApi">
+        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#loadingModal" data-backdrop="static" data-keyboard=false>更新登录帐号</button>
     </form>
+    <div class="col-md-12">
+        <h4>说明:</h4>
+        <p>
+            筛选出用户删除标识为false的用户，再从查询数据库中是否存在该用户，如果存在，则判断登录帐号是否与得到的新的工号信息相同，如果不相同，则修改登录帐号，相同则不处理。
+        </p>
+        <p>
+            筛选出用户删除标识为true的用户，从数据库查找该用户，存在则删除。
+        </p>
+    </div>
 </fieldset>
