@@ -72,12 +72,13 @@ services.AddAuthorization(options =>
 ```
 
 ### 从人力资源管理系统通过WebApi中获取人员信息
+获取的路径为：``~/api/v2/WebApiPersonInfoes``
 获得的信息为:
 ```
 userId: Guid, 用户的Guid
 employeeNo: string，用户的工号
 userName : string，用户的姓名
-delete : bool，删除标志
+deleted : bool，删除标志
 ```
 
 #### 创建人员帐号信息
@@ -480,6 +481,14 @@ dotnet ef migrations add InitialApplicationUser -c ApplicationDbContext -o Data/
 dotnet ef migrations remove -c ApplicationDbContext
 ```
 
+## 发布网站
+### 使用Docker布署
+
+1. 确定网络为 hahaxi_net
+2. 分IP为172.22.16.5
+3. 确定对外端口为6005:80
+```docker run --name identityserversystem --network=hahaxi_net --ip 172.22.16.5 -it -p 6005:80 -d  identityserversystem:1.0.0``
+
 
 ## 相关问题
 1. 测试如果在Client中未加入IdentityResource，而在UserClaim中存在该Resource的Claim，会不会写入到UserToken中?
@@ -523,6 +532,8 @@ app.UseOpenIdConnectAuthentication(options);
 3. 如果在IdentityServer中用户必须添加customResource所管的所有的IdentityResource，如customResource有“customClaimType1”“CustomClaimType2”。只添加customClaimType2一个值，则会出现错误``IDX10501: Signature validation failed. Unable to match 'kid'``。
 如果在没有customClaimType1的情况下，也能够正常运行呢？就像email为空，但仍然可以正常运行，只是不获得该值而已。
 答案 ：在创建IdentityResource时，需将Emphasize设为True，这样即使UserClaim中只有customClaimType1，也不会出现验证错误。
+4. Sorry, there was an error : unauthorized_client
+
 
 # Client管理
 |ClientID|ClientName|Scope|Secret|备注|
@@ -546,6 +557,11 @@ Client本身可以从ApiResource和IdentityResource中获得AllowedScopes的值�
 |IdentityResourceName|DisplayName|ClaimTypes|备注|
 |---|---|---|
 |humanresourcesystem|人力资源管理系统|humanresourcesystem|如果要获得人力资源管理系统的资源|
+
+# 发布到内网
+## 使用Windows Service模式发布网站
+1. 转移数据库
+2. 设定端口号为819
 
 
 

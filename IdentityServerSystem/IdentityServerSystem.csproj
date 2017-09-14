@@ -49,5 +49,6 @@
   <ItemGroup>
     <ProjectReference Include="..\IdentityServerSystemResource\IdentityServerSystemResource.csproj" />
   </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1Production_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
