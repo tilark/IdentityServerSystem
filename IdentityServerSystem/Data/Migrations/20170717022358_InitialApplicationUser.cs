@@ -13,7 +13,7 @@ namespace IdentityServerSystem.Data.Migrations
                 name: "ApplicationDepartments",
                 columns: table => new
                 {
-                    DepartmentID = table.Column<Guid>(nullable: false),
+                    DepartmentID = table.Column<Guid>(nullable: false,defaultValue:Guid.NewGuid()),
                     DepartmentName = table.Column<string>(nullable: true),
                     Remarks = table.Column<string>(nullable: true),
                     TimesStamp = table.Column<byte[]>(rowVersion: true, nullable: true)
@@ -27,7 +27,7 @@ namespace IdentityServerSystem.Data.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false, defaultValue: Guid.NewGuid()),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true)
@@ -41,7 +41,7 @@ namespace IdentityServerSystem.Data.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(nullable: false),
+                    UserId = table.Column<Guid>(nullable: false, defaultValue: Guid.NewGuid()),
                     LoginProvider = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Value = table.Column<string>(nullable: true)
@@ -55,7 +55,7 @@ namespace IdentityServerSystem.Data.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false, defaultValue: Guid.NewGuid()),
                     AccessFailedCount = table.Column<int>(nullable: false),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
                     DepartmentID = table.Column<Guid>(nullable: true),
@@ -89,7 +89,7 @@ namespace IdentityServerSystem.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGeneratedOnAdd", true),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true),
                     RoleId = table.Column<Guid>(nullable: false)
@@ -110,7 +110,7 @@ namespace IdentityServerSystem.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGeneratedOnAdd", true),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true),
                     UserId = table.Column<Guid>(nullable: false)

@@ -50,20 +50,20 @@ namespace IdentityServerSystem
             services.AddMemoryCache();
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseMySql(Configuration.GetConnectionString("mysqlApplicationDBConnection")));
 
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext, Guid>()
                 .AddDefaultTokenProviders();
-            var connectionString = Configuration.GetConnectionString("IdentityServerConnection");
+            var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddIdentityServer()
                 .AddTemporarySigningCredential()
                 .AddConfigurationStore(builder =>
-                    builder.UseSqlServer(connectionString, options =>
+                    builder.UseMySql(connectionString, options =>
                 options.MigrationsAssembly(migrationsAssembly)))
                 .AddOperationalStore(builder =>
-                    builder.UseSqlServer(connectionString, options =>
+                    builder.UseMySql(connectionString, options =>
                 options.MigrationsAssembly(migrationsAssembly)))
                 .AddAspNetIdentity<ApplicationUser>();
 
@@ -152,6 +152,8 @@ namespace IdentityServerSystem
 
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
                 context.Database.Migrate();
+               
+
                 if (!context.Clients.Any())
                 {
                     foreach (var client in Config.GetClients())
@@ -187,6 +189,8 @@ namespace IdentityServerSystem
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
                 serviceScope.ServiceProvider.GetService<ApplicationDbContext>().EnsureSeedData(userManager);
             }
+
+
         }
     }
 }

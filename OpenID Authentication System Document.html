@@ -1101,13 +1101,29 @@ body .markdown-body
 <li><a href="#id-token">ID Token中比较重要的字段</a></li>
 </ul>
 </li>
-<li><a href="#_19">数据库更改</a></li>
-<li><a href="#_20">相关问题</a></li>
+<li><a href="#_19">数据库更改</a><ul>
+<li><a href="#_20">正式数据库</a></li>
+</ul>
+</li>
+<li><a href="#nuget">Nuget包管理</a><ul>
+<li><a href="#mysql">Mysql数据库</a></li>
+<li><a href="#_21">解决主键不能自增或自动创建的问题</a></li>
+</ul>
+</li>
+<li><a href="#_22">发布网站</a><ul>
+<li><a href="#docker">使用Docker布署</a></li>
+</ul>
+</li>
+<li><a href="#_23">相关问题</a></li>
 </ul>
 </li>
 <li><a href="#client_2">Client管理</a></li>
 <li><a href="#apiresource">ApiResource管理</a></li>
 <li><a href="#identityresource_1">IdentityResource管理</a></li>
+<li><a href="#_24">发布到内网</a><ul>
+<li><a href="#windows-service">使用Windows Service模式发布网站</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <h1 id="_1"><a name="user-content-_1" href="#_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>第三方身份认证系统</h1>
@@ -1623,7 +1639,50 @@ dotnet ef migrations add InitialApplicationUser -c ApplicationDbContext -o Data/
 dotnet ef migrations remove -c ApplicationDbContext
 </code></pre></li>
 </ol>
-<h2 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>相关问题</h2>
+<h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>正式数据库</h3>
+<p>发布到Linux服务器，使用Mysql8.0.2</p>
+<h2 id="nuget"><a name="user-content-nuget" href="#nuget" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Nuget包管理</h2>
+<h3 id="mysql"><a name="user-content-mysql" href="#mysql" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Mysql数据库</h3>
+<p><code>Install-Package Pomelo.EntityFrameworkCore.MySql -Version 1.1.2</code><br />
+<code>Install-Package Pomelo.EntityFrameworkCore.MySql.Design -Version 1.1.2</code></p>
+<h3 id="_21"><a name="user-content-_21" href="#_21" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>解决主键不能自增或自动创建的问题</h3>
+<ol>
+<li>如果是int型作为主键，在Migration中需加<br />
+<pre><code> columns: table =&gt; new
+                {
+                    Id = table.Column&lt;int&gt;(nullable: false)
+                        .Annotation(&quot;MySql:ValueGeneratedOnAdd&quot;, true),
+                    ApiScopeId = table.Column&lt;int&gt;(nullable: false),
+                    Type = table.Column&lt;string&gt;(maxLength: 200, nullable: false)
+                },
+</code></pre></li>
+<li>如果是Guid作为主键，在Migration中需加<br />
+<pre><code>columns: table =&gt; new
+                {
+                    Id = table.Column&lt;Guid&gt;(nullable: false, defaultValue: Guid.NewGuid()),
+                    AccessFailedCount = table.Column&lt;int&gt;(nullable: false),
+                },
+</code></pre></li>
+<li>在启动程序时自动进行Migration操作<br />
+<pre><code> using (var serviceScope = app.ApplicationServices.GetService&lt;IServiceScopeFactory&gt;().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetRequiredService&lt;PersistedGrantDbContext&gt;().Database.Migrate();
+
+                var context = serviceScope.ServiceProvider.GetRequiredService&lt;ConfigurationDbContext&gt;();
+                context.Database.Migrate();
+                 serviceScope.ServiceProvider.GetService&lt;ApplicationDbContext&gt;().Database.Migrate();
+            }
+</code></pre></li>
+</ol>
+<h2 id="_22"><a name="user-content-_22" href="#_22" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>发布网站</h2>
+<h3 id="docker"><a name="user-content-docker" href="#docker" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用Docker布署</h3>
+<ol>
+<li>确定网络为 hahaxi_net</li>
+<li>分IP为172.22.16.5</li>
+<li>确定对外端口为6005:80<br />
+<code>`docker run --name identityserversystem --network=hahaxi_net --ip 172.22.16.5 -it -p 6005:80 -d  identityserversystem:1.0.0</code></li>
+</ol>
+<h2 id="_23"><a name="user-content-_23" href="#_23" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>相关问题</h2>
 <ol>
 <li>测试如果在Client中未加入IdentityResource，而在UserClaim中存在该Resource的Claim，会不会写入到UserToken中?<br />
 测试ClientID=mvc<br />
@@ -1662,6 +1721,7 @@ app.UseOpenIdConnectAuthentication(options);
 <li>如果在IdentityServer中用户必须添加customResource所管的所有的IdentityResource，如customResource有“customClaimType1”“CustomClaimType2”。只添加customClaimType2一个值，则会出现错误<code>IDX10501: Signature validation failed. Unable to match 'kid'</code>。<br />
 如果在没有customClaimType1的情况下，也能够正常运行呢？就像email为空，但仍然可以正常运行，只是不获得该值而已。<br />
 答案 ：在创建IdentityResource时，需将Emphasize设为True，这样即使UserClaim中只有customClaimType1，也不会出现验证错误。</li>
+<li>Sorry, there was an error : unauthorized_client</li>
 </ol>
 <h1 id="client_2"><a name="user-content-client_2" href="#client_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Client管理</h1>
 <table>
@@ -1732,4 +1792,10 @@ app.UseOpenIdConnectAuthentication(options);
 <td>humanresourcesystem</td>
 </tr>
 </tbody>
-</table></article></body></html>
+</table>
+<h1 id="_24"><a name="user-content-_24" href="#_24" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>发布到内网</h1>
+<h2 id="windows-service"><a name="user-content-windows-service" href="#windows-service" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用Windows Service模式发布网站</h2>
+<ol>
+<li>转移数据库</li>
+<li>设定端口号为819</li>
+</ol></article></body></html>
