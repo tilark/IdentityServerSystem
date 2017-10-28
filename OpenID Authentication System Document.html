@@ -1130,7 +1130,7 @@ body .markdown-body
 <li><a href="#_25">失败的链接</a></li>
 <li><a href="#_26">成功的链接</a></li>
 <li><a href="#_27">源代码中的测试</a></li>
-<li><a href="#identityserverauthorizationstudyimplicitflowconsoletest">自创建一个控制台测试项目IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest</a><ul>
+<li><a href="#identityserverauthorizationstudyimplicitflowconsoletest">自创建一个控制台测试项目 IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest</a><ul>
 <li><a href="#_28">测试过程及结果</a></li>
 <li><a href="#_29">辅助方法</a></li>
 </ul>
@@ -1880,7 +1880,7 @@ nonce=636447752216332456.NTk3OWNiZDUtMjNhYS00OWEyLWI5MWYtMTVjYTg1NWI3ZjkzZGI1Y2Y
             _mockPipeline.LoginWasCalled.Should().BeTrue();
         }
 </code></pre></p>
-<h3 id="identityserverauthorizationstudyimplicitflowconsoletest"><a name="user-content-identityserverauthorizationstudyimplicitflowconsoletest" href="#identityserverauthorizationstudyimplicitflowconsoletest" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>自创建一个控制台测试项目IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest</h3>
+<h3 id="identityserverauthorizationstudyimplicitflowconsoletest"><a name="user-content-identityserverauthorizationstudyimplicitflowconsoletest" href="#identityserverauthorizationstudyimplicitflowconsoletest" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>自创建一个控制台测试项目 IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest</h3>
 <pre><code> public async static Task Anonymous_user_should_be_redirected_to_login_page()
         {
             var url = CreateAuthorizeUrl(
@@ -1932,10 +1932,7 @@ mvc、mvc2、mvc3test均为GrantTypes.Implicit</p>
 </tr>
 </tbody>
 </table>
-<p>解决办法：<br />
-原来是在创建mvc3test时，在页面端输入字符串时在尾部多了个空格，导致的错误。<br />
-由此问题也可以判断出在IdentityServer4中，对Client的验证是通过ClientId与redirectUri共同验证，二者都需要匹配。<br />
-返回正确的信息：<br />
+<p>返回正确的信息：<br />
 <pre><code>-       RequestMessage  {Method: GET, RequestUri: 'http://localhost:5000/account/login?returnUrl=%2Fconnect%2Fauthorize%2Flogin%3Fclient_id%3Dmvc%26response_type%3Did_token%26scope%3Dopenid%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A5002%252Fsignin-oidc%26state%3D123_state%26nonce%3D123_nonce', Version: 1.1, Content: &lt;null&gt;, Headers:
 {
 }}  System.Net.Http.HttpRequestMessage
@@ -1982,4 +1979,7 @@ mvc、mvc2、mvc3test均为GrantTypes.Implicit</p>
 </code></pre>
 
 <h2 id="_30"><a name="user-content-_30" href="#_30" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>解决办法</h2>
-<p>需要实现IClientStore接口</p></article></body></html>
+<p>需要实现IClientStore接口，在IdentityServer.EntityFramework中已经实现了IClientStore。<br />
+解决办法：<br />
+原来是在创建mvc3test时，在页面端输入字符串时在尾部多了个空格，导致的错误。<br />
+由此问题也可以判断出在IdentityServer4中，对Client的验证是通过ClientId与redirectUri共同验证，二者都需要匹配。</p></article></body></html>

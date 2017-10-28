@@ -673,7 +673,7 @@ IdentityServer4.IntegrationTests.Endpoints.Authorize
             _mockPipeline.LoginWasCalled.Should().BeTrue();
         }
 ```
-### 自创建一个控制台测试项目IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest
+### 自创建一个控制台测试项目 IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest
 
 ```
  public async static Task Anonymous_user_should_be_redirected_to_login_page()
