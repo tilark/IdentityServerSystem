@@ -480,6 +480,43 @@ dotnet ef database update -c ApplicationDbContext
 dotnet ef migrations add InitialApplicationUser -c ApplicationDbContext -o Data/Migrations
 dotnet ef migrations remove -c ApplicationDbContext
 ```
+### 正式数据库
+发布到Linux服务器，使用Mysql8.0.2
+
+## Nuget包管理
+### Mysql数据库
+``Install-Package Pomelo.EntityFrameworkCore.MySql -Version 1.1.2``
+``Install-Package Pomelo.EntityFrameworkCore.MySql.Design -Version 1.1.2``
+### 解决主键不能自增或自动创建的问题
+1. 如果是int型作为主键，在Migration中需加
+```
+ columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGeneratedOnAdd", true),
+                    ApiScopeId = table.Column<int>(nullable: false),
+                    Type = table.Column<string>(maxLength: 200, nullable: false)
+                },
+```
+2. 如果是Guid作为主键，在Migration中需加
+```
+columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false, defaultValue: Guid.NewGuid()),
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                },
+```
+3. 在启动程序时自动进行Migration操作
+```
+ using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+
+                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                context.Database.Migrate();
+                 serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
+            }
+```
 
 ## 发布网站
 ### 使用Docker布署

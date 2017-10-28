@@ -2,7 +2,9 @@
 @{
 }
 <p>
-    <a asp-action="Create">Create New Client</a>
+    <a asp-action="Create" class="btn btn-primary">Create New Client</a>
+    <a asp-action="CreateImplicitClient" class="btn btn-primary">创建 Implicit Client</a>
+
 </p>
 <fieldset class="col-md-12 panel panel-default">
     <legend class="text-blue">Clients</legend>
@@ -64,6 +66,7 @@
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-edit"></span>&nbsp;编辑</a>
                         <a asp-action="ResetClientSecret" asp-route-id="@item.Id" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-warning-sign"></span>&nbsp;重置Client密码</a>
+                        <a asp-action="EditImplicitClient" asp-route-id="@item.Id" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-edit"></span>&nbsp;编辑Implicit</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</a>
                     </td>
 

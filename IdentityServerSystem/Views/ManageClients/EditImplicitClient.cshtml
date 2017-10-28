@@ -1,0 +1,94 @@
+﻿@model IdentityServerSystem.Models.ManageClientViewModels.EditImplicitViewModel
+@inject IdentityServerSystem.Services.ConfigDbContextDropDownListService configContextDropDownList
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<fieldset class="col-md-12 panel panel-default">
+    <legend>编辑ImplicitClient</legend>
+    <form asp-action="EditImplicitClient" asp-controller="ManageClients">
+        <div class="form-horizontal">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input hidden="hidden" asp-for="id" />
+            <div class="form-group">
+                <label asp-for="ClientId" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="ClientId" class="form-control" readonly />
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientName" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="ClientName" class="form-control" />
+                    <span asp-validation-for="ClientName" class="text-danger"></span>
+                </div>
+            </div>          
+
+            @foreach (var redirectUri in Model.RedirectUris)
+            {
+                <div class="form-group clientRedirectUris">
+                    <label asp-for="RedirectUris" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <input name="RedirectUris" value="@redirectUri" class="form-control" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" onclick='deleteTargetElement($(this), ".clientRedirectUris")'><span class="glyphicon glyphicon-trash"></span></button>
+                            </span>
+                        </div><!-- /input-group -->
+                    </div>
+                </div>
+            }
+            <div class="form-group" id="add-redirect-uri">
+                <div class="col-md-offset-4">
+                    <button class="btn btn-default" type="button" onclick='addCloneElementToTargetElementID($(this), ".clientRedirectUris", "#add-redirect-uri")'><span class="glyphicon glyphicon-plus"></span>添加RedirectUri</button>
+                </div>
+            </div>
+            @foreach (var postLogoutRedirectUri in Model.PostLogoutRedirectUris)
+            {
+                <div class="form-group clientPostLogoutRedirectUris">
+                    <label asp-for="PostLogoutRedirectUris" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <input name="PostLogoutRedirectUris" value="@postLogoutRedirectUri" class="form-control" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" onclick='deleteTargetElement($(this), ".clientPostLogoutRedirectUris")'><span class="glyphicon glyphicon-trash"></span></button>
+                            </span>
+                        </div><!-- /input-group -->
+                    </div>
+                </div>
+            }
+
+            <div class="form-group" id="add-post-logout-redirect-uri">
+                <div class="col-md-offset-4">
+                    <button class="btn btn-default" type="button" onclick='addCloneElementToTargetElementID($(this), ".clientPostLogoutRedirectUris", "#add-post-logout-redirect-uri")'><span class="glyphicon glyphicon-plus"></span>添加PostLogoutRedirectUris</button>
+                </div>
+            </div>
+
+
+            <div class="form-group clientAllowedScopes">
+                <label asp-for="AllowedScopes" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+
+                    @*<input name="AllowedScopes" class="form-control" />*@
+                    <select asp-for="AllowedScopes" asp-items="@configContextDropDownList.GetIdentityResourceDisplayNameDropDownList()" class="form-control multiple-bind-select2" multiple style="height:auto"></select>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-5">
+                    <input type="submit" value="更新" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </form>
+    <div>
+        <a asp-action="Index">返回列表</a>
+    </div>
+</fieldset>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @Html.Partial("_Select2Partial")
+}

@@ -35,7 +35,7 @@ namespace IdentityServerSystem
                 new IdentityResources.Profile(),
                 new IdentityResources.Email(),
                 new IdentityResources.Address(),
-                new IdentityResources.Phone()               
+                new IdentityResources.Phone()
             };
         }
 
@@ -65,24 +65,57 @@ namespace IdentityServerSystem
                     },
                     AllowOfflineAccess = true
                 },
+                 //For MEMSCore Implicit Flow
+                new Client
+                {
+                    ClientId = "MEMSNetCore",
+                    ClientName = "MEMSNetCore",
+                    AllowedGrantTypes = GrantTypes.Implicit,
+                     RedirectUris = {"http://localhost:6006/signin-oidc"},
+                    PostLogoutRedirectUris = {"http://localhost:6006/signout-callback-oidc"},
+                    AllowedScopes =
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile
+                    }                   
+                },
                 //For MVC Client implicit flow
                 new Client
                 {
                     ClientId = "mvc",
                     ClientName = "MVC Client",
                     AllowedGrantTypes = GrantTypes.Implicit,
+                    RequireConsent = true,
                     RedirectUris = {"http://localhost:5002/signin-oidc"},
                     PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
                    AllowedScopes = new List<string>
                     {
-                        IdentityServerConstants.StandardScopes.OpenId,                        
+                        IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Email,
                         IdentityServerConstants.StandardScopes.Address,
                         IdentityServerConstants.StandardScopes.Phone
                     }
-                }               
+                },
+                 //For MVC Client implicit flow
+                new Client
+                {
+                    ClientId = "mvc2",
+                    ClientName = "MVC Client2",
+                    AllowedGrantTypes = GrantTypes.Implicit,
+                    RequireConsent = true,
+                    RedirectUris = {"http://localhost:5002/signin-oidc"},
+                    PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
+                   AllowedScopes = new List<string>
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Email,
+                        IdentityServerConstants.StandardScopes.Address,
+                        IdentityServerConstants.StandardScopes.Phone
+                    }
+                }
             };
-        }       
-    }       
+        }
+    }
 }

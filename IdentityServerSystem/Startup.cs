@@ -19,6 +19,7 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Identity;
 using IdentityServerSystem.Models.GetUserInfoFromWebApiViewModels;
+using IdentityServer4.EntityFramework.Interfaces;
 
 namespace IdentityServerSystem
 {
@@ -50,29 +51,30 @@ namespace IdentityServerSystem
             services.AddMemoryCache();
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseMySql(Configuration.GetConnectionString("mysqlApplicationDBConnection")));
 
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext, Guid>()
                 .AddDefaultTokenProviders();
-            var connectionString = Configuration.GetConnectionString("IdentityServerConnection");
+            var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddIdentityServer()
-                .AddTemporarySigningCredential()
+                .AddDeveloperSigningCredential("identityserver.rsa")
+                .AddAspNetIdentity<ApplicationUser>()
                 .AddConfigurationStore(builder =>
-                    builder.UseSqlServer(connectionString, options =>
+                    builder.UseMySql(connectionString, options =>
                 options.MigrationsAssembly(migrationsAssembly)))
                 .AddOperationalStore(builder =>
-                    builder.UseSqlServer(connectionString, options =>
+                    builder.UseMySql(connectionString, options =>
                 options.MigrationsAssembly(migrationsAssembly)))
-                .AddAspNetIdentity<ApplicationUser>();
+                ;
 
             services.AddMvc();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
-
+            //services.AddTransient<IConfigurationDbContext, ConfigurationDbContext>();
             // Configure Identity
             services.Configure<IdentityOptions>(options =>
             {
@@ -152,6 +154,8 @@ namespace IdentityServerSystem
 
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
                 context.Database.Migrate();
+               
+
                 if (!context.Clients.Any())
                 {
                     foreach (var client in Config.GetClients())
@@ -187,6 +191,8 @@ namespace IdentityServerSystem
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
                 serviceScope.ServiceProvider.GetService<ApplicationDbContext>().EnsureSeedData(userManager);
             }
+
+
         }
     }
 }

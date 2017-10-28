@@ -10,6 +10,8 @@ using IdentityServerSystem.Models.ManageClientViewModels;
 using IdentityServer4.Models;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using IdentityServer4.EntityFramework.Interfaces;
 
 namespace IdentityServerSystem.Controllers
 {
@@ -19,10 +21,12 @@ namespace IdentityServerSystem.Controllers
     /// </summary>
     public class ManageClientsController : Controller
     {
-        private readonly ConfigurationDbContext _configurationContext;
-        public ManageClientsController(ConfigurationDbContext configurationContext)
+        //private ConfigurationDbContext _configurationContext;
+        private IConfigurationDbContext _configurationContext;
+        public ManageClientsController(IConfigurationDbContext configueDbContext)
         {
-            this._configurationContext = configurationContext;
+            //this._configurationContext = configurationContext;
+            this._configurationContext = configueDbContext;
         }
         public async Task<IActionResult> Index()
         {
@@ -84,11 +88,37 @@ namespace IdentityServerSystem.Controllers
                 return null;
             }
         }
+        #region Create ImplicitClient
+        /// <summary>
+        /// 创建ImplicitClient
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult CreateImplicitClient()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> CreateImplicitClient(CreateImplicitViewModel createImplicitViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var newClient = await createImplicitViewModel.CreateImplicitClientAsync(_configurationContext);
+                if (newClient != null)
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+            return View(createImplicitViewModel);
+        }
+        #endregion
+
 
         private ICollection<Secret> GetClientSecrets(List<string> clientSecrets)
         {
             var result = new List<Secret>();
-            foreach(var clientSecret in clientSecrets)
+            foreach (var clientSecret in clientSecrets)
             {
                 var secret = new Secret(clientSecret.Sha256());
                 result.Add(secret);
@@ -121,6 +151,8 @@ namespace IdentityServerSystem.Controllers
             }
             return null;
         }
+
+
         #endregion
 
         #region 编辑
@@ -178,6 +210,50 @@ namespace IdentityServerSystem.Controllers
             return View(editClientViewModel);
         }
 
+        #region Create ImplicitClient
+        public async Task<IActionResult> EditImplicitClient(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var client = await _configurationContext.Clients.Include(a => a.AllowedScopes).Include(a => a.RedirectUris).Include(a => a.PostLogoutRedirectUris).Include(a => a.AllowedGrantTypes).Where(a => a.Id == id).FirstOrDefaultAsync();
+            if (client != null)
+            {
+                var viewModel = new EditImplicitViewModel
+                {
+                    ClientId = client.ClientId,
+                    id = client.Id,
+                    ClientName = client.ClientName,
+                    AllowedScopes = client.AllowedScopes.Select(a => a.Scope).ToList(),
+                    RedirectUris = client.RedirectUris.Select(a => a.RedirectUri).ToList(),
+                    PostLogoutRedirectUris = client.PostLogoutRedirectUris.Select(a => a.PostLogoutRedirectUri).ToList(),
+                };
+                return View(viewModel);
+            }
+            else
+            {
+                return BadRequest();
+
+            }
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> EditImplicitClient(EditImplicitViewModel createImplicitViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var newClient = await createImplicitViewModel.UpdateClientAsync(_configurationContext);
+                if (newClient != null)
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+            return View(createImplicitViewModel);
+        }
+        #endregion
+
         /// <summary>
         /// 更新Client属性
         /// </summary>
@@ -225,12 +301,12 @@ namespace IdentityServerSystem.Controllers
         #region 删除
         public async Task<IActionResult> Delete(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return BadRequest();
             }
             var client = await _configurationContext.Clients.SingleOrDefaultAsync(a => a.Id == id);
-            if(client != null)
+            if (client != null)
             {
                 return View(client);
             }
@@ -305,7 +381,7 @@ namespace IdentityServerSystem.Controllers
         private async Task<Client> HandleResetClientSecret(int id, List<string> clientSecrets)
         {
             var updateClient = await _configurationContext.Clients.Include(a => a.ClientSecrets).Include(a => a.AllowedGrantTypes).SingleOrDefaultAsync(a => a.Id == id);
-            if(updateClient!= null)
+            if (updateClient != null)
             {
                 var resetClientSecret = new Client
                 {
@@ -313,7 +389,7 @@ namespace IdentityServerSystem.Controllers
                 }.ToEntity();
                 updateClient.ClientSecrets.Clear();
                 updateClient.ClientSecrets = resetClientSecret.ClientSecrets.ToList();
-                 _configurationContext.Clients.Update(updateClient);
+                _configurationContext.Clients.Update(updateClient);
                 try
                 {
                     await _configurationContext.SaveChangesAsync();

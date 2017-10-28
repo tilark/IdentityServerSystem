@@ -5,36 +5,15 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using IdentityServerSystem.Data;
 
-namespace IdentityServerSystem.Data.Migrations
+namespace IdentityServerSystem.Data.MysqlMigrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170717090228_AddFirstNameInUser")]
-    partial class AddFirstNameInUser
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.1.2")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("IdentityServerSystem.Models.ApplicationDepartment", b =>
-                {
-                    b.Property<Guid>("DepartmentID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("DepartmentName")
-                        .IsRequired();
-
-                    b.Property<string>("Remarks");
-
-                    b.Property<byte[]>("TimesStamp")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate();
-
-                    b.HasKey("DepartmentID");
-
-                    b.ToTable("ApplicationDepartments");
-                });
+                .HasAnnotation("ProductVersion", "1.1.2");
 
             modelBuilder.Entity("IdentityServerSystem.Models.ApplicationRole", b =>
                 {
@@ -68,8 +47,6 @@ namespace IdentityServerSystem.Data.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
-
-                    b.Property<Guid?>("DepartmentID");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);
@@ -106,8 +83,6 @@ namespace IdentityServerSystem.Data.Migrations
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DepartmentID");
 
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
@@ -198,13 +173,6 @@ namespace IdentityServerSystem.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("IdentityServerSystem.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("IdentityServerSystem.Models.ApplicationDepartment", "ApplicationDepartment")
-                        .WithMany()
-                        .HasForeignKey("DepartmentID");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<System.Guid>", b =>

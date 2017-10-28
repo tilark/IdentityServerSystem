@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  identityserversystem:
+    image: identityserversystem
+    build:
+      context: ./IdentityServerSystem
+      dockerfile: Dockerfile
+    ports:
+        - "6005:80"
+    networks:
+        - outside 
+networks:
+  outside:
+    external:
+      name: hahaxi_net
