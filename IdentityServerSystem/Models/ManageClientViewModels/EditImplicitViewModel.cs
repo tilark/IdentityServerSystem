@@ -1,4 +1,5 @@
 ﻿using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Interfaces;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Models;
 using Microsoft.EntityFrameworkCore;
@@ -28,14 +29,14 @@ namespace IdentityServerSystem.Models.ManageClientViewModels
         public List<string> AllowedScopes { get; set; }
 
         #region Public Method
-        public async Task<Client> UpdateClientAsync(ConfigurationDbContext _configurationContext)
+        public async Task<Client> UpdateClientAsync(IConfigurationDbContext _configurationContext)
         {
             var updateClient = await _configurationContext.Clients.Include(a => a.AllowedScopes).Include(a => a.RedirectUris).Include(a => a.PostLogoutRedirectUris).Include(a => a.AllowedGrantTypes).Where(a => a.Id == id).FirstOrDefaultAsync();
             var newClientModel = new Client
             {
                 ClientName = ClientName,
-                RedirectUris = RedirectUris,
-                PostLogoutRedirectUris = PostLogoutRedirectUris,
+                RedirectUris = RedirectUris.Select(a => a.Trim()).ToList(),
+                PostLogoutRedirectUris = PostLogoutRedirectUris.Select(a => a.Trim()).ToList(),
                 AllowedScopes = AllowedScopes
             }.ToEntity();
             updateClient.ClientName = newClientModel.ClientName;

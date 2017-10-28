@@ -10,6 +10,8 @@ using IdentityServerSystem.Models.ManageClientViewModels;
 using IdentityServer4.Models;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using IdentityServer4.EntityFramework.Interfaces;
 
 namespace IdentityServerSystem.Controllers
 {
@@ -19,10 +21,12 @@ namespace IdentityServerSystem.Controllers
     /// </summary>
     public class ManageClientsController : Controller
     {
-        private readonly ConfigurationDbContext _configurationContext;
-        public ManageClientsController(ConfigurationDbContext configurationContext)
+        //private ConfigurationDbContext _configurationContext;
+        private IConfigurationDbContext _configurationContext;
+        public ManageClientsController(IConfigurationDbContext configueDbContext)
         {
-            this._configurationContext = configurationContext;
+            //this._configurationContext = configurationContext;
+            this._configurationContext = configueDbContext;
         }
         public async Task<IActionResult> Index()
         {

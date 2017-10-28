@@ -19,6 +19,7 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Identity;
 using IdentityServerSystem.Models.GetUserInfoFromWebApiViewModels;
+using IdentityServer4.EntityFramework.Interfaces;
 
 namespace IdentityServerSystem
 {
@@ -58,21 +59,22 @@ namespace IdentityServerSystem
             var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddIdentityServer()
-                .AddTemporarySigningCredential()
+                .AddDeveloperSigningCredential("identityserver.rsa")
+                .AddAspNetIdentity<ApplicationUser>()
                 .AddConfigurationStore(builder =>
                     builder.UseMySql(connectionString, options =>
                 options.MigrationsAssembly(migrationsAssembly)))
                 .AddOperationalStore(builder =>
                     builder.UseMySql(connectionString, options =>
                 options.MigrationsAssembly(migrationsAssembly)))
-                .AddAspNetIdentity<ApplicationUser>();
+                ;
 
             services.AddMvc();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
-
+            //services.AddTransient<IConfigurationDbContext, ConfigurationDbContext>();
             // Configure Identity
             services.Configure<IdentityOptions>(options =>
             {

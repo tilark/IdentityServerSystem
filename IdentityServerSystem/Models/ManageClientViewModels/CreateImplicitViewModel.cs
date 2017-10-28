@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Models;
 using IdentityServer4.EntityFramework.Mappers;
+using IdentityServer4.EntityFramework.Interfaces;
 
 namespace IdentityServerSystem.Models.ManageClientViewModels
 {
@@ -23,21 +24,23 @@ namespace IdentityServerSystem.Models.ManageClientViewModels
 
         public List<string> AllowedScopes { get; set; }
 
-        internal async Task<Client> CreateImplicitClientAsync(ConfigurationDbContext _configurationContext)
+        #region Public Method
+       
+        internal async Task<Client> CreateImplicitClientAsync(IConfigurationDbContext _configurationContext)
         {
             var newClient = new Client
             {
                 ClientId = ClientId,
                 ClientName = ClientName,
                 AllowedGrantTypes = GrantTypes.Implicit,
-                RedirectUris = RedirectUris,
-                PostLogoutRedirectUris = PostLogoutRedirectUris,
+                RedirectUris = RedirectUris.Select(a => a.Trim()).ToList(),
+                PostLogoutRedirectUris = PostLogoutRedirectUris.Select(a => a.Trim()).ToList(),
                 AllowedScopes = AllowedScopes
             };
             try
             {
                 _configurationContext.Clients.Add(newClient.ToEntity());
-           
+
                 await _configurationContext.SaveChangesAsync();
                 return newClient;
             }
@@ -47,5 +50,7 @@ namespace IdentityServerSystem.Models.ManageClientViewModels
                 return null;
             }
         }
+
+        #endregion
     }
 }

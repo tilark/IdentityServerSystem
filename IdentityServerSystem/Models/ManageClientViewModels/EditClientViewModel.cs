@@ -7,6 +7,7 @@ using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using IdentityServer4.Models;
 using IdentityServer4.EntityFramework.Mappers;
+using IdentityServer4.EntityFramework.Interfaces;
 
 namespace IdentityServerSystem.Models.ManageClientViewModels
 {
@@ -35,7 +36,8 @@ namespace IdentityServerSystem.Models.ManageClientViewModels
         public bool AllowOfflineAccess { get; set; }
 
         #region Public Method
-        public async Task<Client> UpdateClientAsync(ConfigurationDbContext _configurationContext)
+
+        public async Task<Client> UpdateClientAsync(IConfigurationDbContext _configurationContext)
         {
             var updateClient = await _configurationContext.Clients.Include(a => a.AllowedScopes).Include(a => a.RedirectUris).Include(a => a.PostLogoutRedirectUris).Include(a => a.AllowedGrantTypes).Where(a => a.Id == id).FirstOrDefaultAsync();
             var newClientModel = new Client

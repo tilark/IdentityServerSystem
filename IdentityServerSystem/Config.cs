@@ -85,6 +85,25 @@ namespace IdentityServerSystem
                     ClientId = "mvc",
                     ClientName = "MVC Client",
                     AllowedGrantTypes = GrantTypes.Implicit,
+                    RequireConsent = true,
+                    RedirectUris = {"http://localhost:5002/signin-oidc"},
+                    PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
+                   AllowedScopes = new List<string>
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Email,
+                        IdentityServerConstants.StandardScopes.Address,
+                        IdentityServerConstants.StandardScopes.Phone
+                    }
+                },
+                 //For MVC Client implicit flow
+                new Client
+                {
+                    ClientId = "mvc2",
+                    ClientName = "MVC Client2",
+                    AllowedGrantTypes = GrantTypes.Implicit,
+                    RequireConsent = true,
                     RedirectUris = {"http://localhost:5002/signin-oidc"},
                     PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
                    AllowedScopes = new List<string>

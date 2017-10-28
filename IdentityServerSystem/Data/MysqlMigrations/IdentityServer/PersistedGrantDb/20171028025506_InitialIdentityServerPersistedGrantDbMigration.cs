@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace IdentityServerSystem.Data.Migrations.IdentityServer.PersistedGrantDb
+namespace IdentityServerSystem.Data.MysqlMigrations.IdentityServer.PersistedGrantDb
 {
     public partial class InitialIdentityServerPersistedGrantDbMigration : Migration
     {

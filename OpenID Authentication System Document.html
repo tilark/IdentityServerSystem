@@ -1122,6 +1122,22 @@ body .markdown-body
 <li><a href="#identityresource_1">IdentityResource管理</a></li>
 <li><a href="#_24">发布到内网</a><ul>
 <li><a href="#windows-service">使用Windows Service模式发布网站</a></li>
+<li><a href="#httplocalhost5000well-knownopenid-configuration">http://localhost:5000/.well-known/openid-configuration的信息</a></li>
+</ul>
+</li>
+<li><a href="#clientunauthorized_client">从页面上创建Client后提示unauthorized_client</a><ul>
+<li><a href="#identityserver">客户端向IdentityServer发出的链接请求</a><ul>
+<li><a href="#_25">失败的链接</a></li>
+<li><a href="#_26">成功的链接</a></li>
+<li><a href="#_27">源代码中的测试</a></li>
+<li><a href="#identityserverauthorizationstudyimplicitflowconsoletest">自创建一个控制台测试项目IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest</a><ul>
+<li><a href="#_28">测试过程及结果</a></li>
+<li><a href="#_29">辅助方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_30">解决办法</a></li>
 </ul>
 </li>
 </ul>
@@ -1721,7 +1737,8 @@ app.UseOpenIdConnectAuthentication(options);
 <li>如果在IdentityServer中用户必须添加customResource所管的所有的IdentityResource，如customResource有“customClaimType1”“CustomClaimType2”。只添加customClaimType2一个值，则会出现错误<code>IDX10501: Signature validation failed. Unable to match 'kid'</code>。<br />
 如果在没有customClaimType1的情况下，也能够正常运行呢？就像email为空，但仍然可以正常运行，只是不获得该值而已。<br />
 答案 ：在创建IdentityResource时，需将Emphasize设为True，这样即使UserClaim中只有customClaimType1，也不会出现验证错误。</li>
-<li>Sorry, there was an error : unauthorized_client</li>
+<li>Sorry, there was an error : unauthorized_client<br />
+答：在IdentityServer的数据库中有一个表PersistedGrants。其中在界面端创建的Client并没有写入到此表中</li>
 </ol>
 <h1 id="client_2"><a name="user-content-client_2" href="#client_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Client管理</h1>
 <table>
@@ -1798,4 +1815,171 @@ app.UseOpenIdConnectAuthentication(options);
 <ol>
 <li>转移数据库</li>
 <li>设定端口号为819</li>
-</ol></article></body></html>
+</ol>
+<p>ValidatedAuthorizeRequest </p>
+<h2 id="httplocalhost5000well-knownopenid-configuration"><a href="http://localhost:5000/.well-known/openid-configuration">http://localhost:5000/.well-known/openid-configuration</a>的信息</h2>
+<pre><code>{&quot;issuer&quot;:&quot;http://localhost:5000&quot;,
+&quot;jwks_uri&quot;:&quot;http://localhost:5000/.well-known/openid-configuration/jwks&quot;,
+&quot;authorization_endpoint&quot;:&quot;http://localhost:5000/connect/authorize&quot;,
+&quot;token_endpoint&quot;:&quot;http://localhost:5000/connect/token&quot;,
+&quot;userinfo_endpoint&quot;:&quot;http://localhost:5000/connect/userinfo&quot;,
+&quot;end_session_endpoint&quot;:&quot;http://localhost:5000/connect/endsession&quot;,
+&quot;check_session_iframe&quot;:&quot;http://localhost:5000/connect/checksession&quot;,
+&quot;revocation_endpoint&quot;:&quot;http://localhost:5000/connect/revocation&quot;,
+&quot;introspection_endpoint&quot;:&quot;http://localhost:5000/connect/introspect&quot;,
+&quot;frontchannel_logout_supported&quot;:true,
+&quot;frontchannel_logout_session_supported&quot;:true,
+&quot;scopes_supported&quot;:[&quot;openid&quot;,&quot;profile&quot;,&quot;email&quot;,&quot;address&quot;,&quot;phone&quot;,&quot;scope.readaccess&quot;,&quot;humanresourcesystem&quot;,&quot;offline_access&quot;],
+&quot;claims_supported&quot;:[&quot;sub&quot;,&quot;name&quot;,&quot;family_name&quot;,&quot;given_name&quot;,&quot;middle_name&quot;,&quot;nickname&quot;,&quot;preferred_username&quot;,&quot;profile&quot;,&quot;picture&quot;,&quot;website&quot;,&quot;gender&quot;,&quot;birthdate&quot;,&quot;zoneinfo&quot;,&quot;locale&quot;,&quot;updated_at&quot;,&quot;email&quot;,&quot;email_verified&quot;,&quot;address&quot;,&quot;phone_number&quot;,&quot;phone_number_verified&quot;],
+&quot;grant_types_supported&quot;:[&quot;authorization_code&quot;,&quot;client_credentials&quot;,&quot;refresh_token&quot;,&quot;implicit&quot;,&quot;password&quot;],
+&quot;response_types_supported&quot;:[&quot;code&quot;,&quot;token&quot;,&quot;id_token&quot;,&quot;id_token token&quot;,&quot;code id_token&quot;,&quot;code token&quot;,&quot;code id_token token&quot;],
+&quot;response_modes_supported&quot;:[&quot;form_post&quot;,&quot;query&quot;,&quot;fragment&quot;],
+&quot;token_endpoint_auth_methods_supported&quot;:[&quot;client_secret_basic&quot;,&quot;client_secret_post&quot;],
+&quot;subject_types_supported&quot;:[&quot;public&quot;],&quot;id_token_signing_alg_values_supported&quot;:[&quot;RS256&quot;],
+&quot;code_challenge_methods_supported&quot;:[&quot;plain&quot;,&quot;S256&quot;]
+}
+</code></pre>
+
+<h1 id="clientunauthorized_client"><a name="user-content-clientunauthorized_client" href="#clientunauthorized_client" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>从页面上创建Client后提示unauthorized_client</h1>
+<h2 id="identityserver"><a name="user-content-identityserver" href="#identityserver" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>客户端向IdentityServer发出的链接请求</h2>
+<h3 id="_25"><a name="user-content-_25" href="#_25" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>失败的链接</h3>
+<pre><code>http://localhost:5000/connect/authorize?
+client_id=mvc3test&amp;
+redirect_uri=http%3A%2F%2Flocalhost%3A5002%2Fsignin-oidc&amp;
+response_type=id_token&amp;
+scope=openid%20profile&amp;
+response_mode=form_post&amp;
+nonce=636447745512701425.Mzc2YThjZTUtNmI1OC00ODU0LTgxZWUtYWI4YmQ3ZDBiZTA5MDc2Y2I1MWUtOGI2NS00ODVkLWE5NDUtMTliNjk5OGNhOTBi&amp;state=CfDJ8KPsDI6qEr9Orw1UkiYtsvN9QbI_FGoGs6sGUDgJWhIQo1U95gM9vf-n4UBwr3lJWufAQyX9NxJXDKQo7cN3ThNSh_7bbB392L5RrVhRam5DXrZ86TSzodTutLFn0cz0yhR35ClsR7ljzCNtgGo_HkVjUJ7teT8SqiIpgY7yAv1NEg0Rs2SWVJX17uF9atQIOajd382GlfuntvQB0XvTvh8dtsI2amfgaJiVnwhzx4UW0oNHMbB-OFiIFkg_aT_kJiQ7h7pfFaobSsxBvrq3EAiDShPLO1bVbGAdV-Tp6etpUaQVLVBcOsb6jrJ44SeVAmeIy7aypngXnHApw1VdTBo
+</code></pre>
+
+<h3 id="_26"><a name="user-content-_26" href="#_26" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>成功的链接</h3>
+<pre><code>http://localhost:5000/connect/authorize?
+client_id=mvc2&amp;
+redirect_uri=http%3A%2F%2Flocalhost%3A5002%2Fsignin-oidc&amp;
+response_type=id_token&amp;
+scope=openid%20profile&amp;
+response_mode=form_post&amp;
+nonce=636447752216332456.NTk3OWNiZDUtMjNhYS00OWEyLWI5MWYtMTVjYTg1NWI3ZjkzZGI1Y2Y4MGEtOWUyNS00MTA3LWJlYzgtNGEwNDlhMzkyZGZk&amp;state=CfDJ8KPsDI6qEr9Orw1UkiYtsvP5MrK21X5Bw2OfFQPJ7bGecqxHGN7RwGrZqF-iExb5LEwhUjC6Zdz8_c7aX-1tDy3lkEvIYBUsbzhIWFdwkS1LUHtlu7uGh5_ylTLnoQH2shxupazFIYcZzcNyyG_C3qHNrG8paceifogxnxKV6w_V6ZVDnxGsUXPTIxQrnd7uTcS2J9mpeE1Pca9nbRyruPkT8egk2KUb354sWO2waZ9-2GfIdt2F36HiQSwEYyzU8oTwJSt0qHji7Bg97-cR6ea-QdHbGGkukKNqPWsdNxwHxAh6dipKtRBkZX8c9qVzA-ETBjd8_PXC4LB9DAbwh8s
+</code></pre>
+
+<h3 id="_27"><a name="user-content-_27" href="#_27" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>源代码中的测试</h3>
+<p>IdentityServer4.IntegrationTests.Endpoints.Authorize<br />
+<pre><code> [Fact]
+        [Trait(&quot;Category&quot;, Category)]
+        public async Task anonymous_user_should_be_redirected_to_login_page()
+        {
+            var url = _mockPipeline.CreateAuthorizeUrl(
+                clientId: &quot;client1&quot;,
+                responseType: &quot;id_token&quot;,
+                scope: &quot;openid&quot;,
+                redirectUri: &quot;https://client1/callback&quot;,
+                state: &quot;123_state&quot;,
+                nonce: &quot;123_nonce&quot;);
+            var response = await _mockPipeline.BrowserClient.GetAsync(url);
+
+            _mockPipeline.LoginWasCalled.Should().BeTrue();
+        }
+</code></pre></p>
+<h3 id="identityserverauthorizationstudyimplicitflowconsoletest"><a name="user-content-identityserverauthorizationstudyimplicitflowconsoletest" href="#identityserverauthorizationstudyimplicitflowconsoletest" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>自创建一个控制台测试项目IdentityServerAuthorizationStudy/ImplicitFlowConsoleTest</h3>
+<pre><code> public async static Task Anonymous_user_should_be_redirected_to_login_page()
+        {
+            var url = CreateAuthorizeUrl(
+                clientId: &quot;mvc&quot;,
+                responseType: &quot;id_token&quot;,
+                scope: &quot;openid&quot;,
+                redirectUri: &quot;http://localhost:5002/signin-oidc&quot;,
+                state: &quot;123_state&quot;,
+                nonce: &quot;123_nonce&quot;);
+            HttpClient client = new HttpClient();
+
+            var response = await client.GetAsync(url);
+
+            Console.ReadLine();
+            //_mockPipeline.LoginWasCalled.Should().BeTrue();
+        }
+</code></pre>
+
+<h4 id="_28"><a name="user-content-_28" href="#_28" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>测试过程及结果</h4>
+<p>通过更改clientId与redirectUri<br />
+mvc、mvc2、mvc3test均为GrantTypes.Implicit</p>
+<table>
+<thead>
+<tr>
+<th align="left">clientId</th>
+<th align="left">创建途径</th>
+<th align="left">redirectUri</th>
+<th align="left">测试结果(response.RequestMessage )</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">mvc</td>
+<td align="left">IdentityServer初始化时创建</td>
+<td align="left">&ldquo;<a href="http://localhost:5002/signin-oidc">http://localhost:5002/signin-oidc</a>&ldquo;</td>
+<td align="left">返回正确的信息</td>
+</tr>
+<tr>
+<td align="left">mvc2</td>
+<td align="left">IdentityServer初始化时创建</td>
+<td align="left">&ldquo;<a href="http://localhost:5002/signin-oidc">http://localhost:5002/signin-oidc</a>&ldquo;</td>
+<td align="left">返回正确的信息</td>
+</tr>
+<tr>
+<td align="left">mvc3test</td>
+<td align="left">页面端创建（自制后台创建</td>
+<td align="left">&ldquo;<a href="http://localhost:5002/signin-oidc">http://localhost:5002/signin-oidc</a>&ldquo;</td>
+<td align="left">返回错误的信息</td>
+</tr>
+</tbody>
+</table>
+<p>解决办法：<br />
+原来是在创建mvc3test时，在页面端输入字符串时在尾部多了个空格，导致的错误。<br />
+由此问题也可以判断出在IdentityServer4中，对Client的验证是通过ClientId与redirectUri共同验证，二者都需要匹配。<br />
+返回正确的信息：<br />
+<pre><code>-       RequestMessage  {Method: GET, RequestUri: 'http://localhost:5000/account/login?returnUrl=%2Fconnect%2Fauthorize%2Flogin%3Fclient_id%3Dmvc%26response_type%3Did_token%26scope%3Dopenid%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A5002%252Fsignin-oidc%26state%3D123_state%26nonce%3D123_nonce', Version: 1.1, Content: &lt;null&gt;, Headers:
+{
+}}  System.Net.Http.HttpRequestMessage
+
+</code></pre><br />
+返回错误的信息：<br />
+<pre><code>+       RequestMessage  {Method: GET, RequestUri: 'http://localhost:5000/home/error?errorId=6230335fcbace2c1a7d35df2584ab2a8', Version: 1.1, Content: &lt;null&gt;, Headers:
+{
+}}  System.Net.Http.HttpRequestMessage
+
+</code></pre></p>
+<h4 id="_29"><a name="user-content-_29" href="#_29" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>辅助方法</h4>
+<pre><code>public const string BaseUrl = &quot;http://localhost:5000&quot;;
+        public const string AuthorizeEndpoint = BaseUrl + &quot;/connect/authorize&quot;;
+        public static string CreateAuthorizeUrl(
+           string clientId,
+           string responseType,
+           string scope = null,
+           string redirectUri = null,
+           string state = null,
+           string nonce = null,
+           string loginHint = null,
+           string acrValues = null,
+           string responseMode = null,
+           string codeChallenge = null,
+           string codeChallengeMethod = null,
+           object extra = null)
+        {
+            var url = new AuthorizeRequest(AuthorizeEndpoint).CreateAuthorizeUrl(
+                clientId: clientId,
+                responseType: responseType,
+                scope: scope,
+                redirectUri: redirectUri,
+                state: state,
+                nonce: nonce,
+                loginHint: loginHint,
+                acrValues: acrValues,
+                responseMode: responseMode,
+                codeChallenge: codeChallenge,
+                codeChallengeMethod: codeChallengeMethod,
+                extra: extra);
+            return url;
+        }
+</code></pre>
+
+<h2 id="_30"><a name="user-content-_30" href="#_30" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>解决办法</h2>
+<p>需要实现IClientStore接口</p></article></body></html>
