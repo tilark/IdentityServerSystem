@@ -24,7 +24,7 @@ namespace IdentityServerSystem.Controllers
     /// </summary>
     /// 
 
-    [Authorize(Policy = "AdminUser")]
+    [Authorize(Policy = "Administrator")]
     public class ManageUsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

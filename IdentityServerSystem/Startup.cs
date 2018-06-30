@@ -187,45 +187,69 @@ namespace IdentityServerSystem
             {
                 var persisterGrantDbContext = serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database;
                 
-                    persisterGrantDbContext.Migrate();
+                    //persisterGrantDbContext.Migrate();
 
                
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
                 
-                    context.Database.Migrate();
+                    //context.Database.Migrate();
                               
                
 
                 if (!context.Clients.Any())
                 {
+                    bool canSaveChange = false;
                     foreach (var client in Config.GetClients())
                     {
-                        context.Clients.Add(client.ToEntity());
+                        //如果数据库中已经存在，则不添加
+                        var query = context.Clients.FirstOrDefault(a => a.ClientName == client.ClientName);
+                        if(query == null)
+                        {
+                            canSaveChange = true;
+                            context.Clients.Add(client.ToEntity());
+                        }
                     }
-                    context.SaveChanges();
+                    if(canSaveChange)
+                        context.SaveChanges();
                 }
 
                 if (!context.IdentityResources.Any())
                 {
+                    bool canSaveChange = false;
+
                     foreach (var resource in Config.GetIdentityResources())
                     {
-                        context.IdentityResources.Add(resource.ToEntity());
+                        var query = context.IdentityResources.FirstOrDefault(a => a.Name == resource.Name);
+                        if(query == null)
+                        {
+                            canSaveChange = true;
+                            context.IdentityResources.Add(resource.ToEntity());
+
+                        }
                     }
-                    context.SaveChanges();
-                }
+                    if(canSaveChange)
+                        context.SaveChanges();
+                }   
 
                 if (!context.ApiResources.Any())
                 {
+                    bool canSaveChange = false;
                     foreach (var resource in Config.GetApiResources())
                     {
-                        context.ApiResources.Add(resource.ToEntity());
+                        var query = context.ApiResources.FirstOrDefault(a => a.Name == resource.Name);
+                        if(query == null)
+                        {
+                            context.ApiResources.Add(resource.ToEntity());
+                            canSaveChange = true;
+                        }
                     }
-                    context.SaveChanges();
+                    if(canSaveChange)
+                        context.SaveChanges();
                 }
 
                 //初始化创建Administrator用户
                 // First apply pendding migrations if exist
-                serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
+                //serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
 
                 // Then call seeder method
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
