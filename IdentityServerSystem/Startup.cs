@@ -150,7 +150,7 @@ namespace IdentityServerSystem
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // this will do the initial DB population
-            //InitializeDatabase(app);
+            InitializeDatabase(app);
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -185,10 +185,15 @@ namespace IdentityServerSystem
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
-                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+                var persisterGrantDbContext = serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database;
+                
+                    persisterGrantDbContext.Migrate();
 
+               
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-                context.Database.Migrate();
+                
+                    context.Database.Migrate();
+                              
                
 
                 if (!context.Clients.Any())
@@ -226,8 +231,6 @@ namespace IdentityServerSystem
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
                 serviceScope.ServiceProvider.GetService<ApplicationDbContext>().EnsureSeedData(userManager);
             }
-
-
         }
     }
 }
