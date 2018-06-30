@@ -1,4 +1,5 @@
-﻿<div class="welcome-page">
+﻿@using IdentityServer4.Extensions
+<div class="welcome-page">
     <div class="row page-header">
         <div class="col-sm-10">
             <h1>
@@ -29,6 +30,26 @@
                 Here are links to the
                 <a href="https://github.com/identityserver/IdentityServer4">source code repository</a>,
                 and <a href="https://github.com/identityserver/IdentityServer4.Samples">ready to use samples</a>.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <p>
+                @if (Context.User != null)
+                {
+                    @foreach (var claim in Context.User.Claims)
+                    {
+                        <span>@claim.Type : @claim.Value</span>
+
+                    }
+                    @if (Context.User.Claims.Count() <= 0)
+                    {
+                        <span>User中无Claim</span>
+
+                    }
+                    <span>@Context.User.GetSubjectId()</span>
+                }
             </p>
         </div>
     </div>

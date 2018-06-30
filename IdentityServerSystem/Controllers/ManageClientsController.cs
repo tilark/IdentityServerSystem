@@ -126,7 +126,7 @@ namespace IdentityServerSystem.Controllers
             return result;
         }
 
-        private IEnumerable<string> GetGrantType(GrantTypesEnum grantTypesEnum)
+        private ICollection<string> GetGrantType(GrantTypesEnum grantTypesEnum)
         {
             switch (grantTypesEnum)
             {

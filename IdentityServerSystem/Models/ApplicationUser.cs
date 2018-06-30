@@ -36,7 +36,7 @@ namespace IdentityServerSystem.Models
         /// <summary>
         /// Navigation property for the roles this user belongs to.
         /// </summary>
-        public virtual ICollection<IdentityUserRole<int>> Roles { get; } = new List<IdentityUserRole<int>>();
+        public virtual ICollection<IdentityUserRole<Guid>> Roles { get; } = new List<IdentityUserRole<Guid>>();
 
         /// <summary>
         /// Navigation property for the claims this user possesses.

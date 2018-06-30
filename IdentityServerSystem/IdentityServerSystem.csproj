@@ -14,10 +14,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\AccountController.cs" />
     <Compile Remove="Controllers\ApplicationDepartmentsController.cs" />
     <Compile Remove="Models\ApplicationDepartment.cs" />
+    <Compile Remove="Quickstart\Account\AccountOriginController.cs" />
+    <Compile Remove="Quickstart\Account\AccountService.cs" />
     <Compile Remove="Services\DropDownListService.cs" />
     <Compile Remove="Services\IDropDownListService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Account\Lockout2.cshtml" />
+    <Content Remove="Views\Account\LoggedOut2.cshtml" />
+    <Content Remove="Views\Account\Login2.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
