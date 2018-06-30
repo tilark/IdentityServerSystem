@@ -50,24 +50,37 @@ namespace IdentityServerSystem
             //Add In Memory
             services.AddMemoryCache();
             // Add framework services.
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //    options.UseMySql(Configuration.GetConnectionString("mysqlApplicationDBConnection")));
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("mysqlApplicationDBConnection")));
-
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext, Guid>()
                 .AddDefaultTokenProviders();
-            var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
+            //var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
+            var connectionString = Configuration.GetConnectionString("IdentityServerConnection");
+
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddIdentityServer()
-                .AddDeveloperSigningCredential("identityserver.rsa")
-                .AddAspNetIdentity<ApplicationUser>()
-                .AddConfigurationStore(builder =>
-                    builder.UseMySql(connectionString, options =>
-                options.MigrationsAssembly(migrationsAssembly)))
-                .AddOperationalStore(builder =>
-                    builder.UseMySql(connectionString, options =>
-                options.MigrationsAssembly(migrationsAssembly)))
-                ;
+               .AddDeveloperSigningCredential("identityserver.rsa")
+               .AddAspNetIdentity<ApplicationUser>()
+               .AddConfigurationStore(builder =>
+                   builder.UseSqlServer(connectionString, options =>
+               options.MigrationsAssembly(migrationsAssembly)))
+               .AddOperationalStore(builder =>
+                   builder.UseSqlServer(connectionString, options =>
+               options.MigrationsAssembly(migrationsAssembly)))
+               ;
+            //services.AddIdentityServer()
+            //    .AddDeveloperSigningCredential("identityserver.rsa")
+            //    .AddAspNetIdentity<ApplicationUser>()
+            //    .AddConfigurationStore(builder =>
+            //        builder.UseMySql(connectionString, options =>
+            //    options.MigrationsAssembly(migrationsAssembly)))
+            //    .AddOperationalStore(builder =>
+            //        builder.UseMySql(connectionString, options =>
+            //    options.MigrationsAssembly(migrationsAssembly)))
+            //    ;
 
             services.AddMvc();
 
@@ -114,7 +127,7 @@ namespace IdentityServerSystem
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // this will do the initial DB population
-            InitializeDatabase(app);
+            //InitializeDatabase(app);
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
