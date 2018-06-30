@@ -25,24 +25,30 @@ namespace IdentityServerSystem
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets<Startup>();
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
+        //public Startup(IHostingEnvironment env)
+        //{
+        //    var builder = new ConfigurationBuilder()
+        //        .SetBasePath(env.ContentRootPath)
+        //        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        //        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+        //    if (env.IsDevelopment())
+        //    {
+        //        // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
+        //        builder.AddUserSecrets<Startup>();
+        //    }
+
+        //    builder.AddEnvironmentVariables();
+        //    Configuration = builder.Build();
+        //}
+
+        //public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -55,22 +61,23 @@ namespace IdentityServerSystem
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<ApplicationUser, ApplicationRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext, Guid>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
             //var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
             var connectionString = Configuration.GetConnectionString("IdentityServerConnection");
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            services.AddIdentityServer()
-               .AddDeveloperSigningCredential("identityserver.rsa")
-               .AddAspNetIdentity<ApplicationUser>()
-               .AddConfigurationStore(builder =>
-                   builder.UseSqlServer(connectionString, options =>
-               options.MigrationsAssembly(migrationsAssembly)))
-               .AddOperationalStore(builder =>
-                   builder.UseSqlServer(connectionString, options =>
-               options.MigrationsAssembly(migrationsAssembly)))
-               ;
+            
+            //services.AddIdentityServer()
+            //   .AddDeveloperSigningCredential("identityserver.rsa")
+            //   .AddAspNetIdentity<ApplicationUser>()
+            //   .AddConfigurationStore(builder =>
+            //       builder.UseSqlServer(connectionString, options =>
+            //   options.MigrationsAssembly(migrationsAssembly)))
+            //   .AddOperationalStore(builder =>
+            //       builder.UseSqlServer(connectionString, options =>
+            //   options.MigrationsAssembly(migrationsAssembly)))
+            //   ;
             //services.AddIdentityServer()
             //    .AddDeveloperSigningCredential("identityserver.rsa")
             //    .AddAspNetIdentity<ApplicationUser>()
@@ -84,6 +91,22 @@ namespace IdentityServerSystem
 
             services.AddMvc();
 
+            services.AddIdentityServer()
+               .AddDeveloperSigningCredential(true, "identityserver.rsa")
+               .AddAspNetIdentity<ApplicationUser>()
+               .AddConfigurationStore(options => {
+                   options.ConfigureDbContext = builder =>
+                    builder.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+               })
+               .AddOperationalStore(options =>
+               {
+                   options.ConfigureDbContext = builder =>
+                    builder.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+                   options.EnableTokenCleanup = true;
+                   options.TokenCleanupInterval = 30;
+               });
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
@@ -145,8 +168,7 @@ namespace IdentityServerSystem
 
             app.UseStaticFiles();
 
-            app.UseIdentity();
-
+            //app.UseIdentity();
             // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
             // Adds IdentityServer
             app.UseIdentityServer();
