@@ -186,15 +186,15 @@ namespace IdentityServerSystem
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var persisterGrantDbContext = serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database;
-                
-                    //persisterGrantDbContext.Migrate();
 
-               
+                persisterGrantDbContext.Migrate();
+
+
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-                
-                    //context.Database.Migrate();
-                              
-               
+
+                context.Database.Migrate();
+
+
 
                 if (!context.Clients.Any())
                 {
