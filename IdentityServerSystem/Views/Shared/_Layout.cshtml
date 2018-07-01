@@ -1,10 +1,18 @@
 ﻿@using IdentityServer4.Extensions
+@*@{
+        string name = null;
+        if (!true.Equals(ViewData["signed-out"]))
+        {
+            var user = await Context.GetIdentityServerUserAsync();
+            name = user?.FindFirst("name")?.Value;
+        }
+    }*@
 @{
     string name = null;
     if (!true.Equals(ViewData["signed-out"]))
     {
-        var user = await Context.GetIdentityServerUserAsync();
-        name = user?.FindFirst("name")?.Value;
+        name = Context.User?.GetDisplayName();
+        //var user = Context.User;
     }
 }
 <!DOCTYPE html>
@@ -46,31 +54,32 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">@name <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a asp-action="Logout" asp-controller="AccountOrigin">Logout</a></li>
+                            <li><a asp-action="Logout" asp-controller="Account">Logout</a></li>
                         </ul>
                     </li>
+                    
                 </ul>
             }
-             @if (User.HasClaim(a => a.Type == "Administrator"))
-             {
+            @if (Context.User.HasClaim(a => a.Type == "Administrator"))
+            {
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="ManageUsers" asp-action="Index">人员管理</a></li>
-                    @if (User.HasClaim(a => a.Value == "Administrator"))
+                    @if (Context.User.HasClaim(a => a.Value == "Administrator"))
                     {
                         <li><a asp-area="" asp-controller="ManageIdentityResources" asp-action="Index">IdentityResources</a></li>
                         <li><a asp-area="" asp-controller="ManageClients" asp-action="Index">Clients</a></li>
                         <li><a asp-area="" asp-controller="ManageApiResources" asp-action="Index">ApiResources</a></li>
                         <li><a asp-area="" asp-controller="GetDepartmentFromWebApi" asp-action="Index">从WebApi获取资源</a></li>
                     }
-                   
-                </ul>
-             }
-                
-                @Html.Partial("_LoginPartial")
-            
-                
 
-           
+                </ul>
+            }
+
+            @Html.Partial("_LoginPartial")
+
+
+
+
         </div>
     </div>
 

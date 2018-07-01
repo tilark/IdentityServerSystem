@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace IdentityServerSystem.Models
 {
@@ -31,5 +32,20 @@ namespace IdentityServerSystem.Models
                 return FamilyName + " " + FirstName;
             }
         }
+
+        /// <summary>
+        /// Navigation property for the roles this user belongs to.
+        /// </summary>
+        public virtual ICollection<IdentityUserRole<Guid>> Roles { get; } = new List<IdentityUserRole<Guid>>();
+
+        /// <summary>
+        /// Navigation property for the claims this user possesses.
+        /// </summary>
+        public virtual ICollection<IdentityUserClaim<Guid>> Claims { get; } = new List<IdentityUserClaim<Guid>>();
+
+        /// <summary>
+        /// Navigation property for this users login accounts.
+        /// </summary>
+        public virtual ICollection<IdentityUserLogin<Guid>> Logins { get; } = new List<IdentityUserLogin<Guid>>();
     }
 }

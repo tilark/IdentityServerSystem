@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,64 +10,93 @@ using IdentityServerSystem.Data;
 using IdentityServerSystem.Models;
 using IdentityServerSystem.Services;
 using System.Reflection;
-using IdentityServer4.Validation;
-using IdentityServer4.Services;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Identity;
 using IdentityServerSystem.Models.GetUserInfoFromWebApiViewModels;
-using IdentityServer4.EntityFramework.Interfaces;
-
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 namespace IdentityServerSystem
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets<Startup>();
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
+       
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //不支持GDPR
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            //    options.CheckConsentNeeded = context => false;
+            //    options.MinimumSameSitePolicy = SameSiteMode.None;
+            //});
             //Add In Memory
             services.AddMemoryCache();
             // Add framework services.
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //    options.UseMySql(Configuration.GetConnectionString("mysqlApplicationDBConnection")));
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("mysqlApplicationDBConnection")));
-
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<ApplicationUser, ApplicationRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext, Guid>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-            var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
+            //var connectionString = Configuration.GetConnectionString("mysqlIdentityServerDBConnection");
+            var connectionString = Configuration.GetConnectionString("IdentityServerConnection");
+
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            
+            //services.AddIdentityServer()
+            //   .AddDeveloperSigningCredential("identityserver.rsa")
+            //   .AddAspNetIdentity<ApplicationUser>()
+            //   .AddConfigurationStore(builder =>
+            //       builder.UseSqlServer(connectionString, options =>
+            //   options.MigrationsAssembly(migrationsAssembly)))
+            //   .AddOperationalStore(builder =>
+            //       builder.UseSqlServer(connectionString, options =>
+            //   options.MigrationsAssembly(migrationsAssembly)))
+            //   ;
+            //services.AddIdentityServer()
+            //    .AddDeveloperSigningCredential("identityserver.rsa")
+            //    .AddAspNetIdentity<ApplicationUser>()
+            //    .AddConfigurationStore(builder =>
+            //        builder.UseMySql(connectionString, options =>
+            //    options.MigrationsAssembly(migrationsAssembly)))
+            //    .AddOperationalStore(builder =>
+            //        builder.UseMySql(connectionString, options =>
+            //    options.MigrationsAssembly(migrationsAssembly)))
+            //    ;
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddRazorPagesOptions(options =>
+                {
+                    options.AllowAreas = true;
+                    
+                }); ;
+
             services.AddIdentityServer()
-                .AddDeveloperSigningCredential("identityserver.rsa")
-                .AddAspNetIdentity<ApplicationUser>()
-                .AddConfigurationStore(builder =>
-                    builder.UseMySql(connectionString, options =>
-                options.MigrationsAssembly(migrationsAssembly)))
-                .AddOperationalStore(builder =>
-                    builder.UseMySql(connectionString, options =>
-                options.MigrationsAssembly(migrationsAssembly)))
-                ;
-
-            services.AddMvc();
-
+               .AddDeveloperSigningCredential(true, "identityserver.rsa")
+               .AddAspNetIdentity<ApplicationUser>()
+               .AddConfigurationStore(options => {
+                   options.ConfigureDbContext = builder =>
+                    builder.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+               })
+               .AddOperationalStore(options =>
+               {
+                   options.ConfigureDbContext = builder =>
+                    builder.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+                   options.EnableTokenCleanup = true;
+                   options.TokenCleanupInterval = 30;
+               });
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
@@ -123,17 +149,19 @@ namespace IdentityServerSystem
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-                app.UseBrowserLink();
+                //app.UseBrowserLink();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
-
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.UseIdentity();
-
+            //暂不支持DGPR
+            //app.UseCookiePolicy();
+            //app.UseIdentity();
             // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
             // Adds IdentityServer
             app.UseIdentityServer();
@@ -150,49 +178,76 @@ namespace IdentityServerSystem
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
-                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+                var persisterGrantDbContext = serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database;
+
+                persisterGrantDbContext.Migrate();
+
 
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+
                 context.Database.Migrate();
-               
+
+
 
                 if (!context.Clients.Any())
                 {
+                    bool canSaveChange = false;
                     foreach (var client in Config.GetClients())
                     {
-                        context.Clients.Add(client.ToEntity());
+                        //如果数据库中已经存在，则不添加
+                        var query = context.Clients.FirstOrDefault(a => a.ClientName == client.ClientName);
+                        if(query == null)
+                        {
+                            canSaveChange = true;
+                            context.Clients.Add(client.ToEntity());
+                        }
                     }
-                    context.SaveChanges();
+                    if(canSaveChange)
+                        context.SaveChanges();
                 }
 
                 if (!context.IdentityResources.Any())
                 {
+                    bool canSaveChange = false;
+
                     foreach (var resource in Config.GetIdentityResources())
                     {
-                        context.IdentityResources.Add(resource.ToEntity());
+                        var query = context.IdentityResources.FirstOrDefault(a => a.Name == resource.Name);
+                        if(query == null)
+                        {
+                            canSaveChange = true;
+                            context.IdentityResources.Add(resource.ToEntity());
+
+                        }
                     }
-                    context.SaveChanges();
-                }
+                    if(canSaveChange)
+                        context.SaveChanges();
+                }   
 
                 if (!context.ApiResources.Any())
                 {
+                    bool canSaveChange = false;
                     foreach (var resource in Config.GetApiResources())
                     {
-                        context.ApiResources.Add(resource.ToEntity());
+                        var query = context.ApiResources.FirstOrDefault(a => a.Name == resource.Name);
+                        if(query == null)
+                        {
+                            context.ApiResources.Add(resource.ToEntity());
+                            canSaveChange = true;
+                        }
                     }
-                    context.SaveChanges();
+                    if(canSaveChange)
+                        context.SaveChanges();
                 }
 
                 //初始化创建Administrator用户
                 // First apply pendding migrations if exist
-                serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
+                //serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
 
                 // Then call seeder method
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
                 serviceScope.ServiceProvider.GetService<ApplicationDbContext>().EnsureSeedData(userManager);
             }
-
-
         }
     }
 }

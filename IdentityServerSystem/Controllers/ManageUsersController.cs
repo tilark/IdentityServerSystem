@@ -24,7 +24,7 @@ namespace IdentityServerSystem.Controllers
     /// </summary>
     /// 
 
-    [Authorize(Policy = "AdminUser")]
+    [Authorize(Policy = "Administrator")]
     public class ManageUsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -36,14 +36,12 @@ namespace IdentityServerSystem.Controllers
         public ManageUsersController(
            UserManager<ApplicationUser> userManager,
            SignInManager<ApplicationUser> signInManager,
-           IOptions<IdentityCookieOptions> identityCookieOptions,
            IEmailSender emailSender,
            ISmsSender smsSender,
            ILoggerFactory loggerFactory)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<ManageController>();
