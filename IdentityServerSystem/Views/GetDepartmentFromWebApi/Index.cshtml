@@ -27,12 +27,12 @@
 
     <tr>
         <td>access token</td>
-        <td>@await ViewContext.HttpContext.Authentication.GetTokenAsync("access_token")</td>
+        <td>@await ViewContext.HttpContext.GetTokenAsync("access_token")</td>
 
     </tr>
     <tr>
         <td>refresh token</td>
-        <td>@await ViewContext.HttpContext.Authentication.GetTokenAsync("refresh_token")</td>
+        <td>@await ViewContext.HttpContext.GetTokenAsync("refresh_token")</td>
     </tr>
 </table>
 
